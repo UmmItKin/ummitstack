@@ -2,15 +2,6 @@
 
 The agent skills I use, packaged so anyone can install them. They work in Claude Code, Codex, and the other agents that `npx skills` supports.
 
-## Skills
-
-| Skill | Say | What it does |
-|---|---|---|
-| `soc-me` | `/soc-me linux`, `/soc-me windows` | Read-only security check of this machine: anything compromised, what is odd but yours, what is wasting CPU or memory. Writes one HTML report. |
-| `council` | "council" | Gets review from Claude Opus, Sonnet and Haiku, fixes what they agree on, and loops until they are satisfied. |
-| `conventional-commit` | "commit" | Writes every commit message as one short Conventional Commits line, such as `fix: exclude nobody from orphan list`. |
-| `commit-regular` | `/commit-regular on`, `/commit-regular off` | While on, the agent commits after every finished change without being asked. It never pushes. |
-
 ## Install
 
 ```sh
@@ -18,7 +9,10 @@ npx skills add UmmItKin/ummitstack                    # pick skills from a list
 npx skills add UmmItKin/ummitstack --skill soc-me     # one skill
 ```
 
-## soc-me
+## Skills
+
+<details>
+<summary><b>soc-me</b>: read-only security check of this machine, with an HTML report</summary>
 
 | Agent | Linux | Windows |
 |---|---|---|
@@ -37,13 +31,34 @@ On both systems it checks processes running from temp or user-writable folders, 
 
 The full lists, with what counts as a red flag, are in [`references/linux.md`](skills/soc-me/references/linux.md) and [`references/windows.md`](skills/soc-me/references/windows.md). Suspicious findings get the matching MITRE ATT&CK technique ID, such as T1574.006 for `LD_PRELOAD` hijacking.
 
-## council
+</details>
+
+<details>
+<summary><b>council</b>: code review by Claude Opus, Sonnet and Haiku</summary>
 
 Say "council" after a change. The agent asks Claude Opus, Sonnet and Haiku to review it read-only, checks each finding against the code, fixes the ones it agrees with, and asks again until all three are satisfied. Each review gives a score out of 10, and the final reply (or PR description) has a score table per round.
 
 In Claude Code the three seats are subagents. From Codex or another agent, it calls `claude -p --model <opus|sonnet|haiku>`. Either way you only need a Claude subscription.
 
 Name your preferred members in `CLAUDE.md` or `AGENTS.md`, so you can update the skill without losing them.
+
+</details>
+
+<details>
+<summary><b>conventional-commit</b>: one-line Conventional Commits messages</summary>
+
+Used whenever the agent commits, for example when you say "commit". Each message is one short line, such as `fix: exclude nobody from orphan list`, following [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). No body and no `Co-Authored-By` trailer.
+
+In Claude Code, the first commit of a session sets `"attribution": {"commit": "", "pr": ""}` in `~/.claude/settings.json`, so Claude Code stops adding a co-author line. Your other settings are kept.
+
+</details>
+
+<details>
+<summary><b>commit-regular</b>: commit after every finished change, on or off</summary>
+
+`/commit-regular on` (or no argument) and `/commit-regular off`. While on, the agent commits after each finished, working change without being asked, with a `conventional-commit` message. It runs the project's checks first, stages only the files it changed, and never pushes.
+
+</details>
 
 ## License
 
