@@ -8,6 +8,8 @@ The agent skills I use, packaged so anyone can install them. They work in Claude
 |---|---|---|
 | `soc-me` | `/soc-me linux`, `/soc-me windows` | Read-only security check of this machine: anything compromised, what is odd but yours, what is wasting CPU or memory. Writes one HTML report. |
 | `council` | "council" | Gets review from Claude Opus, Sonnet and Haiku, fixes what they agree on, and loops until they are satisfied. |
+| `conventional-commit` | "commit" | Writes every commit message as one short Conventional Commits line, such as `fix: exclude nobody from orphan list`. |
+| `commit-regular` | `/commit-regular on`, `/commit-regular off` | While on, the agent commits after every finished change without being asked. It never pushes. |
 
 ## Install
 
