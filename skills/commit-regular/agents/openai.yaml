@@ -1,0 +1,5 @@
+interface:
+  display_name: "Commit Regular"
+  short_description: "Toggle committing after every finished change"
+policy:
+  allow_implicit_invocation: false
