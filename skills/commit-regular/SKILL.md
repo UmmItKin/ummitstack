@@ -12,6 +12,8 @@ Arguments: $ARGUMENTS
 - `on`, or no argument: commit regularly from now on. Reply with one line: `commit-regular: on`.
 - `off`: stop committing on your own. Commit only when the user asks again. Reply with one line: `commit-regular: off`.
 
+That line is the whole reply. Nothing before or after it: no explanation of the rules, no setup status, no "next step", and no comment on earlier commits.
+
 ## While it is on
 **Active every response.** Stay on until the user runs `/commit-regular off` or says "stop committing". Do not drift back to waiting for the user to ask.
 
