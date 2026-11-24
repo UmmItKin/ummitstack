@@ -1,6 +1,6 @@
 ---
 name: learn-working-principle
-description: Study a local or GitHub repository and explain how it works: architecture, end-to-end flow, key modules, build and test workflow, and history, using git and gh as the lens. Use when the user asks to learn a codebase or types /learn-working-principle <repo>.
+description: Study a local or GitHub repository and explain how it works, including its architecture, end-to-end flow, key modules, build and test workflow, and history, using git and gh as the lens. Use when the user asks to learn a codebase or types /learn-working-principle <repo>.
 ---
 
 # Learn a working principle
