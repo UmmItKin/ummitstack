@@ -60,6 +60,13 @@ In Claude Code, the first commit of a session sets `"attribution": {"commit": ""
 
 </details>
 
+<details>
+<summary><b>open-ag</b>: open a visible Chromium window with the saved profile</summary>
+
+`/open-ag <url>` opens the URL in a visible window through `agent-browser`, using the profile at `~/.agent-browser-profile`, then prints the page URL. It uses Chromium or Chrome stable if installed, else agent-browser's own Chrome for Testing. In Codex: `$open-ag <url>`. Needs `agent-browser`.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
