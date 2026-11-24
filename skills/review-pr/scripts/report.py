@@ -3,8 +3,8 @@
 
 Every string from the JSON is HTML-escaped: PR titles, diffs and paths can be
 attacker-controlled. Screenshots are embedded as base64 data URIs, so the page
-is one file with no network requests. Material style, light or dark follows the
-system.
+is one file with no network requests. Dark style follows ummit.dev:#0d1117
+background, dot grid, Google Sans fonts when installed, roboto/system fallbacks.
 
 Usage: report.py [-o out.html] < report.json   (prints the output path)
 
@@ -25,58 +25,73 @@ JSON shape:
 import base64, datetime, html, json, os, sys
 
 CSS = """
-:root{--primary:#6750A4;--on-primary:#fff;--primary-container:#EADDFF;--on-primary-container:#21005D;
---surface:#FFFBFE;--surface-2:#F3EDF7;--on-surface:#1C1B1F;--on-surface-variant:#49454F;
---outline:#79747E;--outline-variant:#CAC4D0;--ok:#146C2E;--ok-bg:#E8F5E9;--warn:#7A5900;
---warn-bg:#FFF8E1;--err:#B3261E;--err-bg:#F9DEDC;--add:#E6F4EA;--del:#FCE8E6;
---shadow:0 1px 2px rgba(0,0,0,.3),0 1px 3px 1px rgba(0,0,0,.15)}
-@media (prefers-color-scheme:dark){:root{--primary:#D0BCFF;--on-primary:#381E72;--primary-container:#4F378B;
---on-primary-container:#EADDFF;--surface:#1C1B1F;--surface-2:#2B2930;--on-surface:#E6E1E5;
---on-surface-variant:#CAC4D0;--outline:#938F99;--outline-variant:#49454F;--ok:#7BD88F;--ok-bg:#1B3323;
---warn:#F2C94C;--warn-bg:#352C12;--err:#F2B8B5;--err-bg:#3B1B19;--add:#1E3B2A;--del:#3B1E1C}}
-*{box-sizing:border-box}body{margin:0;background:var(--surface-2);color:var(--on-surface);
-font:15px/1.55 Roboto,"Roboto Flex",system-ui,-apple-system,"Segoe UI",sans-serif}
-header{position:sticky;top:0;z-index:1;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;
-padding:14px 24px;background:var(--primary);color:var(--on-primary);box-shadow:var(--shadow)}
-header h1{margin:0;font-size:20px;font-weight:500}header .repo{opacity:.85;font-size:14px}
-header a{color:var(--on-primary);margin-left:auto;font-weight:500}
-main{max-width:1080px;margin:0 auto;padding:24px 16px 56px;display:flex;flex-direction:column;gap:16px}
-.card{background:var(--surface);border-radius:16px;padding:20px 24px;box-shadow:var(--shadow)}
-h2{margin:0 0 12px;font-size:16px;font-weight:500;letter-spacing:.1px}
-.verdict{border-left:6px solid var(--outline)}.verdict.ok{border-color:var(--ok);background:var(--ok-bg)}
-.verdict.warn{border-color:var(--warn);background:var(--warn-bg)}
-.verdict.err{border-color:var(--err);background:var(--err-bg)}
-.verdict strong{display:block;font-size:22px;font-weight:600}.verdict.ok strong{color:var(--ok)}
-.verdict.warn strong{color:var(--warn)}.verdict.err strong{color:var(--err)}
-.verdict p{margin:6px 0 0;color:var(--on-surface-variant)}
-.verdict code{background:var(--surface);border:1px solid var(--outline-variant);border-radius:6px;
-padding:2px 6px;font:13px/1.4 ui-monospace,monospace}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{display:inline-flex;gap:6px;align-items:center;padding:6px 12px;border-radius:100px;
-background:var(--surface-2);border:1px solid var(--outline-variant);font-size:13px}
-.chip b{font-weight:600}.chip.add{color:var(--ok)}.chip.del{color:var(--err)}
-.chip.pass{background:var(--ok-bg)}.chip.fail{background:var(--err-bg)}
-.chip.pending{background:var(--warn-bg)}
-table{width:100%;border-collapse:collapse;font-size:14px}
-td,th{padding:8px 10px;border-bottom:1px solid var(--outline-variant);text-align:left;vertical-align:top}
-th{color:var(--on-surface-variant);font-weight:500}
-.sev{display:inline-block;padding:2px 8px;border-radius:100px;font-size:12px;font-weight:600}
-.sev.high{background:var(--err-bg);color:var(--err)}.sev.med{background:var(--warn-bg);color:var(--warn)}
-.sev.low{background:var(--ok-bg);color:var(--ok)}.sev.info{background:var(--surface-2);color:var(--on-surface-variant)}
-code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.findings .file{font-size:12px;color:var(--on-surface-variant)}
-.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
-figure{margin:0;background:var(--surface-2);border:1px solid var(--outline-variant);border-radius:12px;overflow:hidden}
+:root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--text:#bbbbbb;--dim:#9ca3af;--faint:#6b7280;
+--line:rgba(125,125,125,.3);--line-strong:rgba(82,82,82,.7);--link:#fff;
+--ok:#34d399;--warn:#eab308;--err:#f87171;
+--sans:"Google Sans Flex","Google Sans",Roboto,"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+--mono:"Google Sans Code","Google Sans Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;position:relative;background:var(--bg);color:var(--text);
+font:16px/1.7 var(--sans);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+background:linear-gradient(90deg,#0d1117 22px,transparent 1%) 50%,
+linear-gradient(#0d1117 22px,transparent 1%) 50%,#2f353c;
+background-position:center center;background-size:24px 24px;
+mask-image:linear-gradient(0deg,transparent 5%,#000)}
+a{color:var(--link);text-decoration:none;border-bottom:1px solid var(--line);transition:border-color .2s}
+a:hover{border-color:rgba(125,125,125,.8)}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+header,main,footer{max-width:48rem;margin:0 auto;padding-left:1.5rem;padding-right:1.5rem}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;padding-top:1.5rem;padding-bottom:1.5rem}
+header .brand{font-weight:700;font-size:1.25rem;color:var(--link)}
+header .repo{opacity:.5}
+header a{margin-left:auto;opacity:.7;border-bottom:none;transition:opacity .2s}
+header a:hover{opacity:1}
+main{padding-bottom:4rem}
+h1{margin:2rem 0 1.5rem;font-size:2.25rem;font-weight:800;line-height:1.11;color:inherit}
+section{margin:2.5rem 0 0;padding-top:1.5rem;border-top:1px solid var(--line)}
+section h2{margin:0 0 1rem;font-size:1.5rem;font-weight:700;line-height:1.33}
+.verdict{margin-top:1rem;padding-top:0;border-top:0;border-left:3px solid var(--line-strong);
+padding-left:1rem}
+.verdict.ok{border-left-color:var(--ok)}.verdict.warn{border-left-color:var(--warn)}
+.verdict.err{border-left-color:var(--err)}
+.verdict strong{display:block;font-size:1.5rem;font-weight:800;line-height:1.2}
+.verdict.ok strong{color:var(--ok)}.verdict.warn strong{color:var(--warn)}
+.verdict.err strong{color:var(--err)}
+.verdict p{margin:.35rem 0 0;color:var(--dim)}
+.verdict code{font:13px var(--mono);background:rgba(115,115,115,.15);border-radius:.25rem;padding:.15em .4em}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .6rem;border-radius:.25rem;
+background:rgba(115,115,115,.15);font-size:.8125rem;line-height:1;white-space:nowrap}
+.chip b{font-weight:600}
+.chip.add,.chip.pass{color:var(--ok)}.chip.del,.chip.fail{color:var(--err)}
+.chip.pending{color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:.875rem;line-height:1.7}
+th,td{padding:.55rem .7rem;text-align:left;vertical-align:top;border-bottom:1px solid rgba(136,136,136,.13)}
+th{padding-top:0;color:var(--dim);font-weight:600}
+.sev{display:inline-block;padding:.15rem .8rem;border-radius:.25rem;font-size:.75rem;font-weight:600}
+.sev.high{background:rgba(248,81,73,.15);color:var(--err)}
+.sev.med{background:rgba(234,179,8,.15);color:var(--warn)}
+.sev.low{background:rgba(52,211,153,.15);color:var(--ok)}
+.sev.info{background:rgba(115,115,115,.15);color:var(--dim)}
+code,pre{font-family:var(--mono)}
+.findings .file{font:12px var(--mono);color:var(--faint);margin:.15rem 0}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem}
+figure{margin:0;border:1px solid var(--line);border-radius:.375rem;overflow:hidden;background:var(--panel)}
 figure img{display:block;width:100%;height:auto}
-figcaption{padding:8px 12px;font-size:13px;color:var(--on-surface-variant)}
-details{border:1px solid var(--outline-variant);border-radius:12px;margin:10px 0;overflow:hidden}
-summary{cursor:pointer;padding:10px 14px;background:var(--surface-2);font-weight:500;
-display:flex;gap:10px;flex-wrap:wrap;align-items:baseline}
-summary .stats{margin-left:auto;font:13px ui-monospace,monospace;color:var(--on-surface-variant)}
-pre{margin:0;padding:12px 0;overflow:auto;background:var(--surface);font-size:12.5px;line-height:1.45}
-.dl{display:block;padding:0 14px;white-space:pre-wrap;word-break:break-word}
-.dl.add{background:var(--add)}.dl.del{background:var(--del)}.dl.hunk{color:var(--primary)}
-footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;font-size:12px;color:var(--on-surface-variant)}
+figcaption{padding:.5rem .75rem;font-size:.8125rem;color:var(--dim)}
+details{border:1px solid var(--line);border-radius:.375rem;margin:.75rem 0;overflow:hidden}
+summary{cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:.6rem;
+padding:.55rem .8rem;background:rgba(115,115,115,.08);font-weight:500}
+summary .stats{margin-left:auto;font:12px var(--mono);color:var(--faint)}
+pre{margin:0;overflow:auto;background:var(--panel);font-size:12.5px;line-height:1.6}
+.dl{display:block;padding:0 .9rem;white-space:pre-wrap;word-break:break-word}
+.dl.add{background:rgba(52,211,153,.09);color:#7ee2b8}
+.dl.del{background:rgba(248,81,73,.09);color:#f0a3a0}
+.dl.hunk{color:#8b949e;padding-top:.25rem}
+footer{border-top:1px solid rgba(82,82,82,.5);padding-top:1rem;padding-bottom:2rem;font-size:.8125rem}
+footer .meta{font:12px var(--mono);opacity:.5;margin-top:.35rem}
 """
 
 VERDICTS = {
@@ -123,21 +138,23 @@ def render(report):
     findings = report.get("findings") or []
     screenshots = report.get("screenshots") or []
     files = report.get("files") or []
+    repo = report.get("repo")
+    pr = report.get("pr")
 
     parts = []
     parts.append('<!doctype html><html lang="en"><head><meta charset="utf-8">')
     parts.append('<meta name="viewport" content="width=device-width, initial-scale=1">')
     parts.append("<title>Review %s #%s</title><style>%s</style></head><body>"
-                 % (esc(report.get("repo")), esc(report.get("pr")), CSS))
+                 % (esc(repo), esc(pr), CSS))
 
-    title = esc(report.get("title")) or "(no title)"
     url = str(report.get("url") or "")
     link = ('<a href="%s">Open on GitHub</a>' % esc(url)
             if url.startswith(("http://", "https://")) else "")
-    parts.append('<header><h1>%s</h1><span class="repo">%s #%s</span>%s</header><main>'
-                 % (title, esc(report.get("repo")), esc(report.get("pr")), link))
+    parts.append('<header><span class="brand">PR review</span><span class="repo">%s #%s</span>%s</header><main>'
+                 % (esc(repo), esc(pr), link))
+    parts.append("<h1>%s</h1>" % (esc(report.get("title")) or "(no title)"))
 
-    parts.append('<section class="card verdict %s"><strong>%s</strong><p>%s</p>'
+    parts.append('<section class="verdict %s"><strong>%s</strong><p>%s</p>'
                  % (vcls, vlabel, esc(report.get("summary"))))
     if verdict == "good":
         parts.append('<p>Merge with <code>/merge-pr-good-to-go</code>.</p>')
@@ -163,7 +180,7 @@ def render(report):
         chips.append('<span class="chip">%s ← %s</span>'
                      % (esc(report.get("base")), esc(report.get("head"))))
     if chips:
-        parts.append('<section class="card"><h2>At a glance</h2><div class="chips">%s</div></section>'
+        parts.append('<section><h2>At a glance</h2><div class="chips">%s</div></section>'
                      % "".join(chips))
 
     if findings:
@@ -176,7 +193,7 @@ def render(report):
                         '<div class="file">%s</div><div>%s</div></td></tr>'
                         % (esc(f.get("severity", "info")), esc(f.get("severity", "info")),
                            esc(f.get("title")), where, esc(f.get("body"))))
-        parts.append('<section class="card findings"><h2>Findings</h2>'
+        parts.append('<section class="findings"><h2>Findings</h2>'
                      '<table><thead><tr><th>Severity</th><th>Detail</th></tr></thead><tbody>%s</tbody></table></section>'
                      % "".join(rows))
 
@@ -190,21 +207,23 @@ def render(report):
             else:
                 figs.append('<figure><figcaption>Missing screenshot: %s</figcaption></figure>'
                             % esc(s.get("path")))
-        parts.append('<section class="card"><h2>Result</h2><div class="shots">%s</div></section>'
+        parts.append('<section><h2>Result</h2><div class="shots">%s</div></section>'
                      % "".join(figs))
 
     if files:
         blocks = []
         for f in files:
             stats_txt = "+%s −%s" % (esc(f.get("added", 0)), esc(f.get("removed", 0)))
-            blocks.append('<details><summary>%s<span class="stats">%s</span></summary>'
+            lines = (f.get("diff") or "").count("\n") + 1
+            opened = " open" if lines <= 80 else ""
+            blocks.append('<details%s><summary>%s<span class="stats">%s</span></summary>'
                           '<pre>%s</pre></details>'
-                          % (esc(f.get("path")), stats_txt, diff_html(f.get("diff"))))
-        parts.append('<section class="card"><h2>Diff</h2>%s</section>' % "".join(blocks))
+                          % (opened, esc(f.get("path")), stats_txt, diff_html(f.get("diff"))))
+        parts.append('<section><h2>Diff</h2>%s</section>' % "".join(blocks))
 
-    parts.append("</main><footer>Read-only review of %s #%s, generated %s.</footer></body></html>"
-                 % (esc(report.get("repo")), esc(report.get("pr")),
-                    esc(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))))
+    parts.append('</main><footer><div>Read-only review of %s #%s</div>'
+                 '<div class="meta">generated %s</div></footer></body></html>'
+                 % (esc(repo), esc(pr), esc(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))))
     return "".join(parts)
 
 

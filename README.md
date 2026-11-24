@@ -77,14 +77,14 @@ A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs th
 <details>
 <summary><b>review-pr</b>: read-only PR review, one HTML page with screenshots</summary>
 
-`/review-pr <number|url>` reviews a pull request read-only with `gh`: reads the diff, clones and checks out the branch in a temp directory, runs the project's quick checks, and for UI changes reproduces the app and screenshots the result with `agent-browser`. It writes one self-contained Material-style HTML page to `~/.review-pr/` with the verdict, findings, screenshots and diff, then prints the `file://` URL. The only writes are the temp clone and the report. Requires `gh`; screenshots need `agent-browser`.
+`/review-pr <number|url>` reviews a pull request read-only with `gh`: reads the diff, clones and checks out the branch in a temp directory, runs the project's quick checks, and for UI changes reproduces the app and screenshots the result with `agent-browser`. It writes one self-contained HTML page styled like ummit.dev to `~/.review-pr/` with the verdict, findings, screenshots and diff, then prints the `file://` URL. The only writes are the temp clone and the report. Requires `gh`; screenshots need `agent-browser`.
 
 </details>
 
 <details>
 <summary><b>merge-pr-good-to-go</b>: merge a PR that passed review</summary>
 
-`/merge-pr-good-to-go <number|url>` runs after a `good to go` review. It checks `gh` and the PR state, asks what comment to post, posts it, asks which merge method to use (squash by default), and merges. It stops on drafts, conflicts, failing checks or a PR that has not been reviewed.
+`/merge-pr-good-to-go <number|url>` runs after a `good to go` review. It checks `gh` and the PR state; if the branch is behind or conflicted, it rebases onto the base branch (or merges), resolves conflicts by hand, rebuilds and checks, and pushes with `--force-with-lease` before asking. Then it asks what comment to post, posts it, asks which merge method to use (squash by default), and merges. It stops on drafts, a branch you cannot push to, failing checks, or a PR that has not been reviewed.
 
 </details>
 

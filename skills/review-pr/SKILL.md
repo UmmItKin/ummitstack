@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Read-only review of a GitHub pull request with gh. Shows the diff and, for UI changes, reproduces the branch and screenshots the result, then writes one self-contained Material-style HTML report. Use when the user asks to review a PR or types /review-pr.
+description: Read-only review of a GitHub pull request with gh. Shows the diff and, for UI changes, reproduces the branch and screenshots the result, then writes one self-contained HTML report styled like ummit.dev. Use when the user asks to review a PR or types /review-pr.
 ---
 
 # Review a pull request
@@ -40,10 +40,10 @@ Accepted forms: a PR number, a PR URL, a branch, or nothing for the current bran
    - Reproduce it: install dependencies, start the dev server or preview build, and find its local URL (read the project's scripts, don't guess).
    - Screenshot the affected routes with `agent-browser`:
      ```sh
-     agent-browser viewport 1440 900
+     agent-browser set viewport 1440 900
      agent-browser open "http://localhost:<port>/<route>"
      agent-browser screenshot "$tmp/desktop-<route>.png"
-     agent-browser viewport 390 844
+     agent-browser set viewport 390 844
      agent-browser screenshot "$tmp/mobile-<route>.png"
      ```
    - If the app cannot be started, say why in the report and continue; do not skip silently. Do not screenshot a deployment you were not asked to visit.
