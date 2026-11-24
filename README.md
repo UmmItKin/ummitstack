@@ -88,6 +88,13 @@ A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs th
 
 </details>
 
+<details>
+<summary><b>learn-working-principle</b>: study a repo's code, flow and history</summary>
+
+`/learn-working-principle <repo-path-or-GitHub-repo>` is a read-only study of how a repository works. It always uses git (log, blame, tags, worktrees) and, for GitHub repos, `gh` for metadata and releases, then asks which branch, tag or commit to learn. It reads the entry points, traces one end-to-end flow with `file:line` citations, reads the tests as the spec, and explains architecture, build and release workflow, and history highlights in chat.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
