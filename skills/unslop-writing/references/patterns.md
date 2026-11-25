@@ -3,7 +3,7 @@
 
 `scripts/scan.py` tags each hit with a strength and the id used below. **Strong** tells justify an edit on one sighting. **Weak** tells need company from other tells in the same passage before you act. Tells marked "read" are not scanned for; look for them while reading.
 
-Why they exist: a language model picks the choice that fits the widest range of readers and subjects. A person writes for one reader about one subject, so their choices are uneven and specific. Every tell below is a default choice. The list follows Wikipedia's "Signs of AI writing" (WikiProject AI Cleanup, CC BY-SA 4.0). Signs are descriptive, not proof, and people write this way too. Never use them to accuse an author.
+Why they exist: a language model picks the choice that fits the widest range of readers and subjects. A person writes for one reader about one subject, so their choices are uneven and specific. Every tell below is a default choice. Signs are descriptive, not proof, and people write this way too. Never use them to accuse an author.
 
 ## Staging instead of stating
 

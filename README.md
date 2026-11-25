@@ -112,7 +112,7 @@ Makes ppt-master slides look designed. The style pass picks a structure for each
 <details>
 <summary><b>unslop-writing</b>: rewrite AI-sounding prose so it reads like a person wrote it</summary>
 
-`/unslop-writing <file-or-pasted-text>` scans prose for known AI-writing tells with `scripts/scan.py` (strong and weak hits with line numbers; code, front matter and URLs are skipped), then rewrites the sentences without adding or losing facts and scans again. It never touches code, commands, paths or YAML, and it follows house rules of no em dashes, no arrow characters and no emoji. `references/patterns.md` lists each tell with its fix. The patterns follow Wikipedia's "Signs of AI writing" (CC BY-SA 4.0).
+`/unslop-writing <file-or-pasted-text>` scans prose for known AI-writing tells with `scripts/scan.py` (strong and weak hits with line numbers; code, front matter and URLs are skipped), then rewrites the sentences without adding or losing facts and scans again. It never touches code, commands, paths or YAML, and it follows house rules of no em dashes, no arrow characters and no emoji. `references/patterns.md` lists each tell with its fix.
 
 </details>
 
@@ -120,6 +120,34 @@ Makes ppt-master slides look designed. The style pass picks a structure for each
 <summary><b>make-deck-from-repo</b>: turn a repo into a finished deck, automatically</summary>
 
 `/make-deck-from-repo <repo-path-or-GitHub-repo>` turns a repository into a deck in one run. It first asks everything in one message (audience, key message, slide count, language, version, style source), each with a recommended answer, or you can say "you decide". After that it works to the end without stopping. It learns the repo with `/learn-working-principle`, takes the style from a website (the CSS plus `agent-browser` screenshots), an existing deck or a ppt-master preset template, plans and draws the slides with ppt-master, styles them with `/unslop-powerpoint-style`, and builds the PPTX and PDF with `/presentation-deck`. It asks mid-run only when a decision has no sensible default, never commits, and resumes from the files already in `deck-<name>/` or from `--from N`.
+
+</details>
+
+<details>
+<summary><b>menti-quiz</b>: join and answer a live Mentimeter quiz</summary>
+
+`/menti-quiz` joins a live Mentimeter quiz in `agent-browser` with the join code, answers each question, screenshots the result, saves one note per question, and commits one per question. Needs `agent-browser`.
+
+</details>
+
+<details>
+<summary><b>answer-pdf</b>: build a submission PDF from answer.md</summary>
+
+Builds one PDF with pandoc and xelatex: title page with name and SID, contents, list of figures, boxed code with file-name bars, file trees, zebra tables and framed screenshots. The templates are in `templates/`; `private.example.tex` holds the name and SID fields, so keep your real `private.tex` out of any public repository.
+
+</details>
+
+<details>
+<summary><b>asking-for-me</b>: checked study material on a topic</summary>
+
+`/asking-for-me <topic> [--kinds ...] [--profile quick|standard|deep] [--source <path>]` writes study notes, quizzes and exercises, then checks them before anything is rendered. A fresh subagent solves the questions blind, another tries to refute the answers, and `scripts/validate.py` checks the format and compares the blind answers with the key. State lives in one `run.json`, with units that end `covered` or `deferred`, and `scripts/progress.py` records which concepts you get wrong so the next run targets them. It is lean by default: `quick` uses one subagent and starts without asking, and `standard` and `deep` are opt-in with a subagent budget. The four `asking-for-me-*` skills below render the verified items and still work alone.
+
+</details>
+
+<details>
+<summary><b>asking-for-me</b>: render the pages, four skills</summary>
+
+`asking-for-me-exercise` makes a fill-in-the-blank page (plus a step-by-step SQL builder), `asking-for-me-quiz` a one-question-at-a-time quiz player, `asking-for-me-study` an explainer page with a ten-year-old version, and `asking-for-me-video` a narrated HTML video lesson (Gemini text to speech, needs `GEMINI_API_KEY`). Each saves under `<course folder>/Gen-asking-for-me/...`. They build on the `answer-me-with-html` skill.
 
 </details>
 
