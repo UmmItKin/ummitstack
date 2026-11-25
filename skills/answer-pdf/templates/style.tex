@@ -1,0 +1,52 @@
+\usepackage[table]{xcolor}
+\definecolor{accent}{HTML}{3B4252}
+
+\usepackage{titlesec}
+\titleformat*{\section}{\Large\bfseries\color{accent}}
+\titleformat*{\subsection}{\normalsize\bfseries\color{accent}}
+\titleformat*{\subsubsection}{\normalsize\bfseries\color{accent}}
+
+\usepackage[most]{tcolorbox}
+\renewenvironment{Shaded}{}{}
+\newtcolorbox{codebox}[1][]{enhanced, breakable, arc=1mm, boxrule=0.5pt,
+  colback=gray!5, colframe=accent, left=2mm, right=2mm, top=1mm, bottom=1mm,
+  coltitle=white, fonttitle=\small\ttfamily\bfseries, toptitle=0.5mm, bottomtitle=0.5mm, #1}
+
+\usepackage{booktabs}
+\arrayrulecolor{accent}
+\setlength{\aboverulesep}{0pt}
+\setlength{\belowrulesep}{0pt}
+\renewcommand{\arraystretch}{1.35}
+\AtBeginEnvironment{longtable}{\rowcolors{2}{white}{gray!7}}
+
+\captionsetup{font=small, labelfont={bf,color=accent}}
+
+\let\plainincludegraphics\includegraphics
+\renewcommand{\includegraphics}[2][]{{\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.4pt}%
+  \fcolorbox{accent}{white}{\plainincludegraphics[#1]{#2}}}}
+
+\usepackage{fontawesome5}
+\usepackage[edges]{forest}
+\newcommand{\treefolder}[1]{\textcolor{accent}{\faFolderOpen[regular]}\enspace\texttt{#1}}
+\newcommand{\treefile}[1]{\textcolor{gray}{\faFile[regular]}\enspace\texttt{#1}}
+\newcommand{\treenote}[1]{\quad{\small\color{gray}#1}}
+\forestset{filetree/.style={for tree={folder, grow'=0, edge={gray!40, line width=0.6pt},
+  folder indent=0.7em, l sep'=1.2em, s sep=0.6mm, inner ysep=1.2pt, inner xsep=1pt}}}
+\newtcolorbox{treebox}{enhanced, arc=1.5mm, boxrule=0.5pt, colback=gray!3, colframe=gray!30,
+  left=3mm, right=3mm, top=2mm, bottom=2mm}
+
+\definecolor{diffadd}{HTML}{D2F0D9}
+\definecolor{diffdel}{HTML}{FBD5D1}
+\definecolor{diffhunk}{HTML}{DDE4F2}
+\newcommand{\diffline}[2]{{\setlength{\fboxsep}{0.6pt}\colorbox{#1}{\parbox{\dimexpr\linewidth-1.2pt}{\small\ttfamily\strut #2}}}\par\nointerlineskip}
+\definecolor{diffaddsign}{HTML}{1A7F37}
+\definecolor{diffdelsign}{HTML}{CF222E}
+\newcommand{\difflnum}[1]{\makebox[2.2em][r]{\textcolor{gray}{#1}}\hspace{0.8em}}
+
+
+\setlength{\emergencystretch}{3em}
+\tolerance=2000
+\hfuzz=1pt
+
+% PDF Author property: pandoc drops the \StudentName/\SID macros from the YAML author
+\AtBeginDocument{\hypersetup{pdfauthor={\StudentName\space(\SID)}}}
