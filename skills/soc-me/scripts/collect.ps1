@@ -38,7 +38,6 @@ Run 'host' {
 }
 
 Run 'top-cpu' {
-    # Total CPU seconds since start; average % = cpu_s / runtime / cores.
     $cores = [Environment]::ProcessorCount
     Show (Get-Process | Where-Object { $_.CPU } | Sort-Object CPU -Descending | Select-Object -First 25 | ForEach-Object {
         $p = $byPid[[int]$_.Id]
@@ -58,14 +57,12 @@ Run 'top-mem' {
 }
 
 Run 'exe-from-odd-path' {
-    # Executables in user-writable or temp locations.
     $odd = '\\AppData\\Local\\Temp\\|\\Windows\\Temp\\|\\Users\\Public\\|\\Downloads\\|\\\$Recycle\.Bin\\|^[A-Z]:\\ProgramData\\[^\\]+\.exe$|\\AppData\\Roaming\\[^\\]+\.exe$'
     Show ($procs | Where-Object { $_.ExecutablePath -match $odd } |
         Select-Object ProcessId, ParentProcessId, Name, ExecutablePath, CommandLine)
 }
 
 Run 'masquerade' {
-    # Windows system binary names running from outside the Windows folder.
     $sys = 'svchost.exe','lsass.exe','csrss.exe','winlogon.exe','services.exe','smss.exe','wininit.exe','explorer.exe',
            'taskhostw.exe','dllhost.exe','rundll32.exe','conhost.exe','spoolsv.exe','lsm.exe','dwm.exe','sihost.exe'
     Show ($procs | Where-Object { $sys -contains $_.Name.ToLower() -and $_.ExecutablePath -and -not (Under $_.ExecutablePath @($windir)) } |
@@ -73,7 +70,6 @@ Run 'masquerade' {
 }
 
 Run 'suspicious-cmdline' {
-    # Encoded or download-and-run PowerShell, and LOLBins fetching remote content.
     $rx = '(?i)-enc(odedcommand)?\s|frombase64string|downloadstring|downloadfile|invoke-expression|\biex\b|net\.webclient|' +
           'invoke-webrequest.+\|\s*iex|bitsadmin.+/transfer|certutil.+-urlcache|mshta(\.exe)?\s+["'']?(https?|javascript|vbscript):|' +
           'regsvr32.+/i:https?|rundll32.+(javascript|https?:)|-w(indowstyle)?\s+hid'
@@ -81,7 +77,6 @@ Run 'suspicious-cmdline' {
 }
 
 Run 'odd-parent-child' {
-    # Office, PDF readers or script hosts starting a shell.
     $parents = 'winword.exe','excel.exe','powerpnt.exe','outlook.exe','onenote.exe','acrord32.exe','acrobat.exe','wscript.exe','cscript.exe','mshta.exe'
     $kids = 'cmd.exe','powershell.exe','pwsh.exe','wscript.exe','cscript.exe','mshta.exe','rundll32.exe','regsvr32.exe','certutil.exe','bitsadmin.exe'
     Show ($procs | Where-Object { $kids -contains $_.Name.ToLower() -and $parents -contains (& $name $_.ParentProcessId).ToLower() } |
@@ -89,7 +84,6 @@ Run 'odd-parent-child' {
 }
 
 Run 'unsigned-running' {
-    # Running executables outside the Windows folder without a valid signature.
     $paths = $procs | Where-Object { $_.ExecutablePath -and -not (Under $_.ExecutablePath @($windir)) } |
              Select-Object -ExpandProperty ExecutablePath -Unique | Select-Object -First 200
     Show ($paths | ForEach-Object {
@@ -98,7 +92,6 @@ Run 'unsigned-running' {
 }
 
 Run 'orphans-long-running' {
-    # Interactive-session processes whose parent has exited, running over 1 hour: forgotten dev servers, browsers, agents.
     $cut = (Get-Date).AddHours(-1)
     Show ($procs | Where-Object { $_.SessionId -ne 0 -and -not $byPid.ContainsKey([int]$_.ParentProcessId) -and $_.CreationDate -lt $cut } |
         Select-Object ProcessId, Name, @{n='Started'; e={$_.CreationDate}},
@@ -147,7 +140,6 @@ Run 'scheduled-tasks' {
 }
 
 Run 'services' {
-    # Services whose binary is outside the Windows folder; Unquoted = path with spaces and no quotes.
     Show (Get-CimInstance Win32_Service | Where-Object { $_.PathName -and $_.PathName -notmatch [regex]::Escape($windir) } |
         Select-Object Name, State, StartMode, StartName,
             @{n='Unquoted'; e={ $_.PathName -notmatch '^"' -and ($_.PathName -split '\.exe')[0] -match ' ' }}, PathName)
@@ -179,7 +171,6 @@ Run 'accounts' {
 }
 
 Run 'recent-executables' {
-    # Scripts and binaries written in the window to user-writable folders.
     $roots = $env:TEMP, $env:APPDATA, $env:LOCALAPPDATA, $env:PUBLIC, $env:ProgramData
     if ($env:USERPROFILE) { $roots += Join-Path $env:USERPROFILE 'Downloads' }
     $ext = '.exe','.dll','.scr','.ps1','.bat','.cmd','.vbs','.js','.hta','.lnk','.msi'

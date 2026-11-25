@@ -20,7 +20,6 @@ sec top-mem
 ps -eo pid,ppid,user,rss,etime,comm --sort=-rss | head -15
 
 sec exe-from-odd-path
-# deleted binaries or binaries living in world-writable/temp dirs
 for p in /proc/[0-9]*; do
   e=$(readlink "$p/exe" 2>/dev/null) || continue
   case "$e" in *'(deleted)'*|/tmp/*|/dev/shm/*|/var/tmp/*|/run/user/*|*/.cache/*)
@@ -42,7 +41,6 @@ sec zombies
 ps -eo pid,ppid,stat,etime,comm | awk 'NR==1 || $3 ~ /Z/'
 
 sec orphans-long-running
-# reparented to init, human user (uid>=1000), up >1h: often forgotten dev servers/browsers
 ps -eo pid,ppid,uid,user,etimes,etime,args | awk 'NR==1 || ($2==1 && $3>=1000 && $3<65534 && $5>3600)' | cut -c1-200
 
 sec listeners
@@ -61,7 +59,6 @@ if have systemctl; then
 else echo "(no systemd)"; ls /etc/init.d 2>/dev/null | tr '\n' ' '; fi
 
 sec persistence-files
-# admin/user-added units, cron, autostart, rc files: list and flag recent ones
 for d in /etc/systemd/system ~/.config/systemd/user /etc/cron.d /etc/cron.hourly /etc/cron.daily \
          /var/spool/cron /var/spool/cron/crontabs /etc/xdg/autostart ~/.config/autostart /etc/profile.d; do
   [ -e "$d" ] && { echo "-- $d"; ls -la "$d" 2>&1 | tail -n +2; }
@@ -83,7 +80,6 @@ have who && who
 have last && last -n 10 2>/dev/null | head -12
 
 sec unowned-recent-binaries
-# binaries changed in the window that no package owns
 if   have pacman; then own() { pacman -Qo "$1" >/dev/null 2>&1; }
 elif have dpkg;   then own() { dpkg -S "$1" >/dev/null 2>&1; }
 elif have rpm;    then own() { rpm -qf "$1" >/dev/null 2>&1; }

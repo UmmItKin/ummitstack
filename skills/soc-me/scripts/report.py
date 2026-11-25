@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
 """Render a soc-me report (JSON on stdin) into one self-contained HTML page.
-
-Every string from the JSON is HTML-escaped: host data (process args, file
-names) can be attacker-controlled. The only script is the copy button, allowed
-by its hash in the CSP. No external resources.
-On screen it is one readable page: title and host line, the verdict, then one
-section per panel. Printing gives a
-16:9 landscape deck, one section per page. Light or dark follows the system.
-
 Usage: report.py [-o out.html] < report.json   (prints the output path)
 
 JSON shape:
@@ -26,13 +18,12 @@ low / info renders a severity label. Items starting with "+ ", "- ", "~ " get
 diff marks.
 """
 import base64, datetime, hashlib, html, json, os, sys
+from collections import namedtuple
 
 SANS = 'system-ui,-apple-system,"Segoe UI","Noto Sans TC","Noto Sans CJK TC","PingFang TC",Roboto,sans-serif'
 SERIF = '"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Noto Serif CJK TC","Songti TC",serif'
 MONO = 'ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,monospace'
 
-# Paper palette (from answer-me-with-html). Contrast on --paper, light / dark:
-# ink 16.4 / 13.9, ink2 7.6 / 7.8, badges 5.5-7.6 on their tints, chip text 6.3-10.0.
 CSS = """
 :root{color-scheme:light dark;--bg:#f5f2ea;--paper:#fdfbf6;--ink:#1f1c17;--ink2:#57514a;--line:#e5dfd3;--fline:#cbc3b4;
 --fill:#f3eee4;--ok:#2e6a3b;--ok-bg:#e4efe5;--warn:#7f5300;--warn-bg:#f6ecd6;--err:#a3251b;--err-bg:#f7e3e0;
@@ -97,7 +88,6 @@ td{border:0;padding:4px 18px}td[data-col]:not(:first-child):before{content:attr(
 @media print{@page{size:13.333in 7.5in;margin:.35in}html,body{background:#fff}main{max-width:none;padding:0;display:block;zoom:1.35}
 header{break-after:page}section{break-before:page;border:0}code{cursor:auto}.copy{display:none}.term pre{padding:14px 16px;white-space:pre-wrap}}
 """
-# The only script on the page: copies a command block. The CSP allows it by hash, so injected scripts cannot run.
 SCRIPT = ("document.addEventListener('click',function(ev){var b=ev.target.closest('[data-copy]');if(!b)return;"
           "var el=document.getElementById(b.dataset.copy),t=el.textContent;"
           "function done(){b.textContent=b.dataset.done;setTimeout(function(){b.textContent=b.dataset.label},1500)}"
@@ -110,10 +100,11 @@ BADGE = {"ok": "✓", "no": "✗", "warn": "!"}
 SEV = ("crit", "high", "med", "low", "info")
 TONE_BADGE = {"ok": "ok", "warn": "warn", "err": "no"}
 MARKS = {"+ ": ("add", "+"), "- ": ("del", "−"), "~ ": ("same", "~")}
-WORDS = {  # per language: clean, suspicious, compromised, copy, copied, copy all
-    "zh-Hant": ("乾淨", "可疑", "已入侵", "複製", "已複製", "複製全部指令"),
-    "zh": ("干净", "可疑", "已入侵", "复制", "已复制", "复制全部指令"),
-    "en": ("Clean", "Suspicious", "Compromised", "Copy", "Copied", "Copy all commands"),
+Words = namedtuple("Words", "clean suspicious compromised copy copied copy_all")
+WORDS = {
+    "zh-Hant": Words("乾淨", "可疑", "已入侵", "複製", "已複製", "複製全部指令"),
+    "zh": Words("干净", "可疑", "已入侵", "复制", "已复制", "复制全部指令"),
+    "en": Words("Clean", "Suspicious", "Compromised", "Copy", "Copied", "Copy all commands"),
 }
 e = lambda s: html.escape(str(s), quote=True)
 
@@ -126,7 +117,6 @@ def words(lang):
 
 
 def lead(s):
-    """Split a leading status or severity keyword off s; return (label html, rest)."""
     s = str(s)
     head, _, rest = s.partition(" ")
     if head in BADGE:
@@ -137,7 +127,6 @@ def lead(s):
 
 
 def text(s):
-    """Escape s; `backtick` spans anywhere become <code>. Unbalanced backticks stay literal."""
     parts = str(s).split("`")
     if len(parts) % 2 == 0:
         return e(s)
@@ -146,7 +135,7 @@ def text(s):
 
 def cell(v):
     tag, rest = lead(v)
-    return f"{tag} {text(rest)}" if tag else text(rest)  # real space, so copied text reads "LOW LLMNR", not "LOWLLMNR"
+    return f"{tag} {text(rest)}" if tag else text(rest)
 
 
 def item(s):
@@ -173,13 +162,12 @@ def lines(xs):
 
 
 def copy_button(tid, label, w):
-    return (f'<button type="button" class="copy" data-copy="{tid}" data-label="{e(label)}" data-done="{e(w[4])}" '
+    return (f'<button type="button" class="copy" data-copy="{tid}" data-label="{e(label)}" data-done="{e(w.copied)}" '
             f'aria-live="polite">{e(label)}</button>')
 
 
 def term(tid, cmd, w):
-    """A terminal-style block: one command per line, with a Copy button."""
-    return f'<div class="term"><pre id="{tid}">{e(chr(10).join(cmd))}</pre>{copy_button(tid, w[3], w)}</div>'
+    return f'<div class="term"><pre id="{tid}">{e(chr(10).join(cmd))}</pre>{copy_button(tid, w.copy, w)}</div>'
 
 
 def card(c, tid, w):
@@ -195,7 +183,7 @@ def section(i, p, w):
     body += "".join(card(c, f"c{i}-{k}", w) for k, c in enumerate(p.get("cards", [])))
     note = f'<span class="note">{e(p["note"])}</span>' if p.get("note") else '<span class="note"></span>'
     cp = lines(p.get("copy"))
-    btn = copy_button(f"all{i}", w[5], w) + f'<pre id="all{i}" hidden>{e(chr(10).join(cp))}</pre>' if cp else ""
+    btn = copy_button(f"all{i}", w.copy_all, w) + f'<pre id="all{i}" hidden>{e(chr(10).join(cp))}</pre>' if cp else ""
     head = (f'<span class="n {tone}" aria-hidden="true">{count(p)}</span>'
             f'<h2 id="h{i}">{e(p.get("title", ""))}</h2>{note}{btn}')
     return f'<section aria-labelledby="h{i}"><div class="ph">{head}</div>{body}</section>'
@@ -206,7 +194,7 @@ def render(d):
     w = words(lang)
     verdict = d.get("verdict", "")
     tone = TONES.get(verdict, "")
-    vlabel = dict(zip(("clean", "suspicious", "compromised"), w[:3])).get(verdict, verdict)
+    vlabel = dict(zip(w._fields[:3], w[:3])).get(verdict, verdict)
     meta = dict(d.get("meta", {}))
     when = meta.pop("time", "")
     facts = ([f"<span><b>{e(when)}</b></span>"] if when else []) + [f"<span>{e(k)} <b>{e(v)}</b></span>" for k, v in meta.items()]
@@ -226,7 +214,7 @@ def render(d):
 if __name__ == "__main__":
     out = sys.argv[2] if sys.argv[1:2] == ["-o"] else None
     if not out:
-        home = os.path.join(os.path.expanduser("~"), ".soc-my-pc")  # same place on Linux and Windows
+        home = os.path.join(os.path.expanduser("~"), ".soc-my-pc")
         os.makedirs(home, exist_ok=True)
         out = os.path.join(home, datetime.datetime.now().strftime("report-%Y%m%d-%H%M%S.html"))
     with open(out, "w", encoding="utf-8") as f:

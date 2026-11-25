@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
 """Render a review-pr report (JSON on stdin) into one self-contained HTML page.
-
-Every string from the JSON is HTML-escaped: PR titles, diffs and paths can be
-attacker-controlled. Screenshots are embedded as base64 data URIs, so the page
-is one file with no network requests. Dark style follows ummit.dev:#0d1117
-background, dot grid, Google Sans fonts when installed, roboto/system fallbacks.
-
 Usage: report.py [-o out.html] < report.json   (prints the output path)
 
 JSON shape:

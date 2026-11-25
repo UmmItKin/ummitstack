@@ -29,5 +29,5 @@ tmp = path + ".tmp"
 with open(tmp, "w", encoding="utf-8") as f:
     json.dump(data, f, indent=2, ensure_ascii=False)
     f.write("\n")
-os.replace(tmp, path)  # atomic: a crash never leaves a half-written settings file
+os.replace(tmp, path)
 print("set")
