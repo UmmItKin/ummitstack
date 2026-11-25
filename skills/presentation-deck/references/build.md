@@ -24,7 +24,7 @@ Run from the project directory. `S` is ppt-master's `scripts/` directory, `P` th
 Other export flags: `--native-charts-and-tables` when charts or tables must stay editable, `--image-sizing display` when the checker reports oversized images, `-a none` or `--no-animations` to disable motion. An `animations.json` sidecar is picked up automatically.
 
 ## Traps
-- The quality gate is the export's input, not an optional check. Rerun it after any SVG change; a stale report blocks or misleads the exporter.
+- The final quality gate feeds the export. Rerun it after any SVG change, because a stale report blocks the exporter or misleads it.
 - Split notes only when `total.md` exists; exporting notes that do not exist fails.
 - Install the deck's fonts locally before the PDF (`cp fonts/*.ttf ~/.local/share/fonts && fc-cache -f`), or it falls back to other fonts. Package names and nerd-font variants often differ; check the family name with `fc-scan`.
 - Preview with `rsvg-convert`, not LibreOffice: its rendering differs from PowerPoint.

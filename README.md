@@ -70,7 +70,14 @@ In Claude Code, the first commit of a session sets `"attribution": {"commit": ""
 <details>
 <summary><b>presentation-deck</b>: build a PowerPoint from SVG slides with ppt-master</summary>
 
-A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs the final quality gate, note split, SVG preview, PPTX and PDF export, then checks the counts. `references/build.md` has the manual commands, export flags, source layout and known traps. `references/diagrams.md` and `templates/` hold the diagram styles (zones, boundary, sequence, chevron flow, data model) to copy from, and `scripts/sequence.py` draws a sequence diagram from a JSON spec.
+A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs the final quality gate, note split, SVG preview, PPTX and PDF export, then checks the counts. `references/build.md` has the manual commands, export flags, source layout and known traps.
+
+</details>
+
+<details>
+<summary><b>unslop-powerpoint-style</b>: make a ppt-master deck look designed, not generated</summary>
+
+Makes ppt-master slides look designed. The style pass picks a structure for each slide (equal zones with a numbered kicker, a tinted system boundary, a sequence diagram with dashed dividers, chevron steps, a code panel with one highlighted line) and draws it by hand with jittered frames, curved lines and open chevron arrowheads. The template step copies the closest file from `templates/` and replaces its content, and `scripts/sequence.py` draws a sequence diagram from a JSON spec. Arrows are always drawn and never typed as characters, slide text has no em dashes, and the deck's own fonts are checked and installed first. Both steps end by rendering every touched slide and looking at it.
 
 </details>
 
@@ -91,7 +98,21 @@ A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs th
 <details>
 <summary><b>learn-working-principle</b>: study a repo's code, flow and history</summary>
 
-`/learn-working-principle <repo-path-or-GitHub-repo>` is a read-only study of how a repository works. It always uses git (log, blame, tags, worktrees) and, for GitHub repos, `gh` for metadata and releases, then asks which branch, tag or commit to learn. It reads the entry points, traces one end-to-end flow with `file:line` citations, reads the tests as the spec, and explains architecture, build and release workflow, and history highlights in chat.
+`/learn-working-principle <repo-path-or-GitHub-repo>` is a read-only study of how a repository works. It always uses git (log, blame, tags, worktrees) and, for GitHub repos, `gh` for metadata and releases, then asks which branch, tag or commit to learn. It reads the entry points, traces one end-to-end flow with `file:line` citations, reads the tests as the spec, and explains architecture, build and release workflow, and history highlights in chat. `--rev <revision>` skips the version question and `--out <file>` also writes the explanation to a file, so other skills can read it.
+
+</details>
+
+<details>
+<summary><b>unslop-writing</b>: rewrite AI-sounding prose so it reads like a person wrote it</summary>
+
+`/unslop-writing <file-or-pasted-text>` scans prose for known AI-writing tells with `scripts/scan.py` (strong and weak hits with line numbers; code, front matter and URLs are skipped), then rewrites the sentences without adding or losing facts and scans again. It never touches code, commands, paths or YAML, and it follows house rules of no em dashes, no arrow characters and no emoji. `references/patterns.md` lists each tell with its fix. The patterns follow Wikipedia's "Signs of AI writing" (CC BY-SA 4.0).
+
+</details>
+
+<details>
+<summary><b>make-deck-from-repo</b>: turn a repo into a finished deck, automatically</summary>
+
+`/make-deck-from-repo <repo-path-or-GitHub-repo>` turns a repository into a deck in one run. It first asks everything in one message (audience, key message, slide count, language, version, style source), each with a recommended answer, or you can say "you decide". After that it works to the end without stopping. It learns the repo with `/learn-working-principle`, takes the style from a website (the CSS plus `agent-browser` screenshots), an existing deck or a ppt-master preset template, plans and draws the slides with ppt-master, styles them with `/unslop-powerpoint-style`, and builds the PPTX and PDF with `/presentation-deck`. It asks mid-run only when a decision has no sensible default, never commits, and resumes from the files already in `deck-<name>/` or from `--from N`.
 
 </details>
 
