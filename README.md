@@ -56,7 +56,14 @@ In Claude Code, the first commit of a session sets `"attribution": {"commit": ""
 <details>
 <summary><b>commit-regular</b>: commit after every finished change, on or off</summary>
 
-`/commit-regular on` (or no argument) and `/commit-regular off`. While on, the agent commits after each finished, working change without being asked, with a `conventional-commit` message. It runs the project's checks first, stages only the files it changed, and never pushes.
+`/commit-regular on` (or no argument) and `/commit-regular off`. While on, the agent commits after each finished, working change without being asked, with a `conventional-commit` message. It runs the project's checks first, runs `check-commit-info` on what it staged, stages only the files it changed, and never pushes.
+
+</details>
+
+<details>
+<summary><b>check-commit-info</b>: check a commit for personal information before it is made</summary>
+
+`/check-commit-info ["commit message"]` runs `scripts/check.sh` on the staged files and the message. It requires git's own `user.name` and `user.email` to be set and uses them as they are (never `--author`); if one is missing it asks you for it. It then looks for key and `.env` files, email addresses, home paths, common token formats and your own name or login, and prints only the kind and `file:line`, never the secret. Placeholders such as `/home/user` and `you@example.com` pass. `commit-regular` runs it before every commit.
 
 </details>
 

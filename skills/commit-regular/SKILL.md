@@ -21,6 +21,7 @@ That line is the whole reply. Nothing before or after it: no explanation of the 
 - Before each commit, run the project's quick checks if it has them (tests, lint, a smoke script). If they fail, fix the change or leave it uncommitted and say why. Never commit a broken state.
 - Write each message with the `conventional-commit` skill: one line, as short as possible.
 - Stage only the files you changed for that change. Leave the user's other uncommitted work alone.
+- Before each commit, run the `check-commit-info` skill on the staged files and the message. Use git's own name and email as they are. Do not commit while it reports a `stop`, and if the name or email is not set, ask the user for it.
 - Never commit secrets, `.env` files, build output or large generated files.
 - Never push, amend, rebase or force anything. Pushing stays the user's call.
 - If the folder is not a git repository, or the user is in the middle of a merge or rebase, do not commit; say so once.
