@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Draw a hand-drawn sequence diagram group. Usage: sequence.py spec.json > group.svg
-spec: {"x":612,"y":198,"w":604,"lifelines":["Admin","Express"],"sections":[{"name":"Edit","messages":[[0,1,"POST /x"],[1,0,"302 /y"]]}]}
-Message = [from index, to index, label]. Right arrows are amber, left arrows are the secondary green.
-Colours are the Group 17 terminal palette; change the constants for another deck."""
+spec: {"x":612,"y":198,"w":604,"lifelines":["Customer","Server"],"sections":[{"name":"Order","messages":[[0,1,"POST /orders"],[1,0,"302 /receipt"]]}]}
+Message = [from index, to index, label]. Right arrows are amber, left arrows are the secondary green."""
 import json, sys
 AMBER, GREEN, RULE, TEXT, MONO = '#FFBF00', '#88C996', '#185E2B', '#B8FFCC', 'font-family="Share Tech Mono, ui-monospace, monospace"'
 s = json.load(sys.stdin); x0, y0, w = s['x'], s['y'], s['w']

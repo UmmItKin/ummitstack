@@ -11,4 +11,4 @@ ppt-master converts one SVG per slide into native, editable PowerPoint shapes, n
 
 Read `references/build.md` for the manual commands, export flags, the source layout and the known traps.
 
-Before you draw or restyle any diagram, read `references/diagrams.md` and copy the nearest file from `templates/`. `scripts/sequence.py` generates sequence diagrams.
+To draw or restyle slides and diagrams, use the `unslop-powerpoint-style` skill.
