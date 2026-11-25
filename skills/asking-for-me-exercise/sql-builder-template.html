@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>一步一步砌 SQL</title>
+<style>
+  :root { --bg:#09090b; --panel:#111114; --line:#27272a; --soft:#18181b; --text:#fafafa; --muted:#a1a1aa; --ok:#22c55e; --bad:#ef4444; --kw:#93c5fd; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; padding:36px 18px 60px; }
+  .wrap { max-width:860px; margin:0 auto; }
+  h1 { font-size:28px; margin:0 0 6px; font-weight:600; }
+  .sub { color:var(--muted); font-size:15px; margin:0 0 18px; line-height:1.6; }
+  .progress { display:flex; align-items:center; gap:12px; margin:0 0 24px; color:var(--muted); font-size:14px; font-family:ui-monospace,Menlo,monospace; }
+  .bar { flex:1; height:6px; background:var(--line); border-radius:6px; overflow:hidden; }
+  .bar > div { height:100%; background:var(--ok); transition:width .4s; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; margin-bottom:22px; overflow:hidden; }
+  .card.done { border-color:#166534; }
+  .head { display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); }
+  .badge { display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:28px; padding:0 6px; border-radius:7px; background:var(--text); color:var(--bg); font-weight:700; font-size:13px; }
+  .card.done .badge { background:var(--ok); }
+  .qtitle { font-size:16px; font-weight:600; line-height:1.5; }
+  .body { padding:18px; }
+  .label { color:var(--muted); font-size:13px; margin:0 0 8px; }
+  .tables { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+  .tbl { background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:10px 12px; }
+  .tbl b { display:block; font-size:13px; margin-bottom:6px; color:var(--kw); font-family:ui-monospace,Menlo,monospace; }
+  table { border-collapse:collapse; font-family:ui-monospace,Menlo,monospace; font-size:13px; }
+  th, td { text-align:left; padding:4px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th { color:var(--muted); font-weight:500; }
+  tr:last-child td { border-bottom:none; }
+  .step { border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:10px; background:var(--soft); }
+  .step.locked { opacity:.35; pointer-events:none; }
+  .step.ok { border-color:var(--ok); background:rgba(34,197,94,.08); }
+  .step-q { font-size:14px; margin-bottom:8px; }
+  .step-q span { color:var(--muted); font-family:ui-monospace,Menlo,monospace; margin-right:8px; }
+  .line { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .kw { font-family:ui-monospace,Menlo,monospace; font-weight:700; color:var(--kw); min-width:84px; }
+  input { flex:1; min-width:220px; background:var(--panel); color:var(--text); border:1px solid #52525b; border-radius:8px; padding:8px 10px; font-family:ui-monospace,Menlo,monospace; font-size:14px; }
+  input:focus { outline:none; border-color:var(--text); }
+  input:disabled { border-color:var(--ok); color:#bbf7d0; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .chip { background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 12px; font-family:ui-monospace,Menlo,monospace; font-size:13px; cursor:pointer; }
+  .chip:hover { border-color:#71717a; }
+  .msg { margin-top:10px; font-size:14px; line-height:1.6; }
+  .msg.ok { color:#bbf7d0; }
+  .msg.bad { color:#fecaca; }
+  .final { display:none; margin-top:16px; }
+  .card.done .final { display:block; }
+  pre.sql { background:var(--soft); border:1px solid var(--ok); border-radius:10px; padding:12px 14px; font-family:ui-monospace,Menlo,monospace; font-size:14px; line-height:1.7; white-space:pre-wrap; margin:0 0 14px; }
+  .btn { background:transparent; color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 14px; font-size:13px; cursor:pointer; font-family:inherit; }
+  .btn:hover { border-color:#71717a; }
+  .row-end { display:flex; justify-content:flex-end; margin-top:12px; }
+  .footer { text-align:center; color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:12px; margin-top:28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 id="title"></h1>
+  <p class="sub" id="sub"></p>
+  <div class="progress"><span id="count"></span><div class="bar"><div id="bar" style="width:0%"></div></div></div>
+  <div id="list"></div>
+  <div class="footer">SQL step-by-step practice · offline · open in any browser</div>
+</div>
+<script>
+// ===== Content: edit PAGE, TABLES and QUESTIONS only =====
+var PAGE = {
+  title: "一步一步砌 SQL",
+  sub: "每一題都拆成幾個步驟：先想要哪些欄位，再想從哪個表、什麼條件。旁邊有用到的表和範例資料。點選答案或自己打字，答對才會打開下一步，最後會顯示完整的 SQL 和查詢結果。"
+};
+
+var TABLES = {
+  Cinema: { cols: ["cinemaNo", "cinemaName", "district"], rows: [
+    ["C1", "Star Cinema", "Mong Kok"], ["C2", "Sky Cinema", "Sha Tin"], ["C3", "Moon Cinema", "Mong Kok"]] },
+  Movie: { cols: ["movieNo", "title", "genre", "ticketPrice"], rows: [
+    ["M1", "Space Trip", "Sci-Fi", "90"], ["M2", "Funny Day", "Comedy", "70"], ["M3", "Dark Night", "Horror", "110"]] },
+  Member: { cols: ["memberNo", "memberName", "memberAddress"], rows: [
+    ["B1", "Amy", "12 Nathan Road, Mong Kok"], ["B2", "Ben", "8 Main Street, Sha Tin"], ["B3", "Cindy", "3 Lake Road, Sha Tin"]] },
+  Ticket: { cols: ["cinemaNo", "memberNo", "movieNo", "seats"], rows: [
+    ["C1", "B1", "M1", "2"], ["C1", "B2", "M3", "1"], ["C2", "B1", "M2", "3"]] }
+};
+
+var QUESTIONS = [
+  { title: "(a) 列出旺角所有戲院的全部資料", use: ["Cinema"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？「全部資料」就是全部欄位。", options: ["*", "ALL", "cinemaName"], answers: ["*"],
+        hint: "代表全部欄位的符號只有一個字元。", why: "* 代表全部欄位。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Cinema", "Movie", "Ticket"], answers: ["Cinema"],
+        hint: "戲院的資料放在哪個表？", why: "戲院的資料在 Cinema 表。" },
+      { kw: "WHERE", q: "什麼條件？只要旺角的戲院。", options: ["district = 'Mong Kok'", "cinemaName = 'Mong Kok'", "district = Mong Kok"],
+        answers: ["district = 'Mong Kok'"], hint: "地區在哪一個欄位？文字要加單引號。", why: "地區在 district 欄位，文字值要用單引號。" }
+    ],
+    result: { cols: ["cinemaNo", "cinemaName", "district"], rows: [["C1", "Star Cinema", "Mong Kok"], ["C3", "Moon Cinema", "Mong Kok"]] } },
+
+  { title: "(b) 列出住在沙田的會員名字和地址，按名字排序", use: ["Member"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？只要名字和地址。", options: ["memberName, memberAddress", "*", "memberName"], answers: ["memberName, memberAddress"],
+        hint: "兩個欄位，用逗號分開。", why: "只列出題目要求的兩個欄位。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Member", "Ticket", "Cinema"], answers: ["Member"],
+        hint: "會員的資料在哪裡？", why: "會員資料在 Member 表。" },
+      { kw: "WHERE", q: "什麼條件？地址裡有 Sha Tin。", options: ["memberAddress LIKE '%Sha Tin%'", "memberAddress = 'Sha Tin'", "memberAddress LIKE 'Sha Tin'"],
+        answers: ["memberAddress LIKE '%Sha Tin%'"], hint: "地址很長，Sha Tin 只是其中一部分，要用 LIKE 和 %。", why: "LIKE 加 % 可以找出地址中任何位置有 Sha Tin 的資料。" },
+      { kw: "ORDER BY", q: "按哪一個欄位排序？", options: ["memberName", "memberAddress", "memberNo"], answers: ["memberName", "memberName ASC"],
+        hint: "題目說按名字排序。", why: "ORDER BY memberName 預設由小到大（ASC）。" }
+    ],
+    result: { cols: ["memberName", "memberAddress"], rows: [["Ben", "8 Main Street, Sha Tin"], ["Cindy", "3 Lake Road, Sha Tin"]] } },
+
+  { title: "(c) 列出還沒有買過票的會員名字", use: ["Member", "Ticket"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？", options: ["memberName", "*", "memberNo"], answers: ["memberName"],
+        hint: "題目只要名字。", why: "只列出會員名字。" },
+      { kw: "FROM", q: "主要從哪一個表拿名字？", options: ["Member", "Ticket", "Movie"], answers: ["Member"],
+        hint: "名字放在哪個表？", why: "名字在 Member 表。" },
+      { kw: "WHERE", q: "什麼條件？會員編號不在 Ticket 裡出現過。", options: ["memberNo NOT IN (SELECT memberNo FROM Ticket)", "memberNo IN (SELECT memberNo FROM Ticket)", "memberNo != (SELECT memberNo FROM Ticket)"],
+        answers: ["memberNo NOT IN (SELECT memberNo FROM Ticket)"], hint: "先用 subquery 拿出買過票的人，再排除他們。", why: "subquery 拿出買過票的會員，NOT IN 把他們排除。" }
+    ],
+    result: { cols: ["memberName"], rows: [["Cindy"]] } },
+
+  { title: "(d) 計算 Star Cinema 的戲票總收入，命名為 income", use: ["Ticket", "Movie", "Cinema"],
+    steps: [
+      { kw: "SELECT", q: "要計算什麼？收入 = 座位數 × 票價，全部加起來。", options: ["SUM(seats * ticketPrice) AS income", "COUNT(seats) AS income", "SUM(ticketPrice) AS income"],
+        answers: ["SUM(seats * ticketPrice) AS income"], hint: "加總用哪一個 function？要乘上座位數。", why: "SUM 把每一張票的座位數乘票價加起來，AS 命名為 income。" },
+      { kw: "FROM", q: "要用到哪些表？座位在 Ticket，票價在 Movie，戲院名在 Cinema。", options: ["Ticket t, Movie m, Cinema c", "Ticket", "Ticket t, Movie m"],
+        answers: ["Ticket t, Movie m, Cinema c"], hint: "三種資料在三個不同的表。", why: "三個表都要用，t、m、c 是別名。" },
+      { kw: "WHERE", q: "怎樣把表接起來，再只要 Star Cinema？", options: ["t.movieNo = m.movieNo AND t.cinemaNo = c.cinemaNo AND cinemaName = 'Star Cinema'", "cinemaName = 'Star Cinema'", "t.movieNo = m.movieNo AND cinemaName = 'Star Cinema'"],
+        answers: ["t.movieNo = m.movieNo AND t.cinemaNo = c.cinemaNo AND cinemaName = 'Star Cinema'"], hint: "三個表需要兩個連接條件，再加上戲院名字。", why: "兩個連接條件把三個表接起來，最後篩選戲院名字。" }
+    ],
+    result: { cols: ["income"], rows: [["290"]] } },
+
+  { title: "(e) 列出票價高於平均的電影，並顯示高出多少（priceDiff）", use: ["Movie"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？名字，以及票價減平均。", options: ["title, ticketPrice - (SELECT AVG(ticketPrice) FROM Movie) AS priceDiff", "title, AVG(ticketPrice) AS priceDiff", "title, ticketPrice AS priceDiff"],
+        answers: ["title, ticketPrice - (SELECT AVG(ticketPrice) FROM Movie) AS priceDiff"], hint: "平均要用 subquery 算出來，再用 AS 命名。", why: "subquery 算出平均，用票價減去它，AS 命名為 priceDiff。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Movie", "Ticket", "Cinema"], answers: ["Movie"],
+        hint: "票價在哪一個表？", why: "票價在 Movie 表。" },
+      { kw: "WHERE", q: "什麼條件？票價比平均高。", options: ["ticketPrice > (SELECT AVG(ticketPrice) FROM Movie)", "ticketPrice > AVG(ticketPrice)", "AVG(ticketPrice) > ticketPrice"],
+        answers: ["ticketPrice > (SELECT AVG(ticketPrice) FROM Movie)"], hint: "WHERE 不能直接用 AVG，要用 subquery。", why: "WHERE 不能直接放 aggregate，所以用 subquery 算平均。" }
+    ],
+    result: { cols: ["title", "priceDiff"], rows: [["Dark Night", "20"]] } },
+
+  { title: "(f) 總共有多少位會員？命名為 total", use: ["Member"],
+    steps: [
+      { kw: "SELECT", q: "要計算什麼？數有幾列。", options: ["COUNT(*) AS total", "SUM(*) AS total", "MAX(memberNo) AS total"],
+        answers: ["COUNT(*) AS total"], hint: "數數量的 function 是哪一個？", why: "COUNT(*) 數有幾列，每一列就是一位會員。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Member", "Ticket", "Cinema"], answers: ["Member"],
+        hint: "會員資料在哪裡？", why: "會員資料在 Member 表。" }
+    ],
+    result: { cols: ["total"], rows: [["3"]] } },
+
+  { title: "(g) 每一間戲院總共賣出多少座位", use: ["Ticket"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？戲院編號，以及座位總數。", options: ["cinemaNo, SUM(seats)", "cinemaNo, seats", "SUM(seats)"],
+        answers: ["cinemaNo, SUM(seats)"], hint: "要顯示戲院，也要加總座位。", why: "cinemaNo 顯示戲院，SUM(seats) 加總座位。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Ticket", "Cinema", "Movie"], answers: ["Ticket"],
+        hint: "座位數在哪一個表？", why: "座位數在 Ticket 表。" },
+      { kw: "GROUP BY", q: "按什麼分組？", options: ["cinemaNo", "seats", "memberNo"], answers: ["cinemaNo"],
+        hint: "SELECT 裡的普通欄位，都要寫進 GROUP BY。", why: "每間戲院一組，SUM 就會分別計算。" }
+    ],
+    result: { cols: ["cinemaNo", "SUM(seats)"], rows: [["C1", "3"], ["C2", "3"]] } },
+
+  { title: "(h) 只列出總共買了超過 2 個座位的會員", use: ["Ticket"],
+    steps: [
+      { kw: "SELECT", q: "要哪些欄位？", options: ["memberNo, SUM(seats)", "memberNo, seats", "SUM(seats)"],
+        answers: ["memberNo, SUM(seats)"], hint: "要顯示會員，也要加總座位。", why: "memberNo 顯示會員，SUM(seats) 加總座位。" },
+      { kw: "FROM", q: "資料在哪一個表？", options: ["Ticket", "Member", "Movie"], answers: ["Ticket"],
+        hint: "座位數在哪一個表？", why: "座位數在 Ticket 表。" },
+      { kw: "GROUP BY", q: "按什麼分組？", options: ["memberNo", "cinemaNo", "seats"], answers: ["memberNo"],
+        hint: "要每個會員一組。", why: "每個會員一組，各自加總。" },
+      { kw: "HAVING", q: "分組後只留下超過 2 個座位的。", options: ["SUM(seats) > 2", "seats > 2", "COUNT(*) > 2"], answers: ["SUM(seats) > 2"],
+        hint: "篩選的是整組的總數。", why: "HAVING 在分組後篩選，所以用 SUM(seats) > 2。" }
+    ],
+    result: { cols: ["memberNo", "SUM(seats)"], rows: [["B1", "5"]] } }
+];
+
+var state = QUESTIONS.map(function (q) { return { step: 0, done: false }; });
+
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+function norm(s) { return String(s).toLowerCase().replace(/"/g, "'").replace(/;+\s*$/, "").replace(/\s+/g, ""); }
+
+function tableHTML(name, t) {
+  var h = '<div class="tbl"><b>' + esc(name) + '</b><table><tr>' + t.cols.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr>";
+  t.rows.forEach(function (r) { h += "<tr>" + r.map(function (v) { return "<td>" + esc(v) + "</td>"; }).join("") + "</tr>"; });
+  return h + "</table></div>";
+}
+
+function fullSQL(q) {
+  return q.steps.map(function (s) { return s.kw + " " + s.answers[0]; }).join("\n") + ";";
+}
+
+function renderCard(qi) {
+  var q = QUESTIONS[qi], st = state[qi];
+  var h = '<div class="head"><span class="badge">' + (st.done ? "✓" : String.fromCharCode(65 + qi)) + '</span><span class="qtitle">' + esc(q.title) + "</span></div>";
+  h += '<div class="body"><p class="label">用到的表和範例資料</p><div class="tables">' + q.use.map(function (n) { return tableHTML(n, TABLES[n]); }).join("") + "</div>";
+  q.steps.forEach(function (s, si) {
+    var cls = si < st.step || st.done ? "step ok" : si === st.step ? "step" : "step locked";
+    var solved = si < st.step || st.done;
+    h += '<div class="' + cls + '" id="s' + qi + "_" + si + '">';
+    h += '<div class="step-q"><span>步驟 ' + (si + 1) + "</span>" + esc(s.q) + "</div>";
+    h += '<div class="line"><span class="kw">' + esc(s.kw) + '</span><input id="i' + qi + "_" + si + '" data-q="' + qi + '" data-s="' + si + '" placeholder="點選下方答案，或自己輸入後按 Enter" autocomplete="off" spellcheck="false"' + (solved ? ' disabled value="' + esc(s.answers[0]) + '"' : "") + "></div>";
+    if (!solved) {
+      h += '<div class="chips">' + s.options.map(function (o) { return '<button class="chip" data-q="' + qi + '" data-s="' + si + '" data-v="' + esc(o) + '">' + esc(o) + "</button>"; }).join("") + "</div>";
+    }
+    h += '<div class="msg ' + (solved ? "ok" : "") + '" id="m' + qi + "_" + si + '">' + (solved ? "✓ " + esc(s.why) : "") + "</div>";
+    h += "</div>";
+  });
+  h += '<div class="final"><p class="label">完整的 SQL</p><pre class="sql">' + esc(fullSQL(q)) + '</pre><p class="label">查詢結果</p>' + tableHTML("Result", q.result) + "</div>";
+  h += '<div class="row-end"><button class="btn" data-reset="' + qi + '">重新做這一題</button></div></div>';
+  var card = document.getElementById("card" + qi);
+  card.className = "card" + (st.done ? " done" : "");
+  card.innerHTML = h;
+}
+
+function updateProgress() {
+  var n = state.filter(function (s) { return s.done; }).length;
+  document.getElementById("count").textContent = n + " / " + QUESTIONS.length + " 題完成";
+  document.getElementById("bar").style.width = (n / QUESTIONS.length * 100) + "%";
+}
+
+function tryAnswer(qi, si, value) {
+  var s = QUESTIONS[qi].steps[si], st = state[qi];
+  if (si !== st.step || st.done) return;
+  var ok = s.answers.some(function (a) { return norm(a) === norm(value); });
+  if (ok) {
+    st.step++;
+    if (st.step >= QUESTIONS[qi].steps.length) st.done = true;
+    renderCard(qi);
+    updateProgress();
+    var next = document.getElementById("i" + qi + "_" + st.step);
+    if (next && !st.done) next.focus();
+  } else {
+    var m = document.getElementById("m" + qi + "_" + si);
+    m.className = "msg bad";
+    m.textContent = "還不對。提示：" + s.hint;
+  }
+}
+
+function mount() {
+  document.getElementById("title").textContent = PAGE.title;
+  document.getElementById("sub").textContent = PAGE.sub;
+  var list = document.getElementById("list");
+  QUESTIONS.forEach(function (q, qi) {
+    var div = document.createElement("div");
+    div.id = "card" + qi;
+    list.appendChild(div);
+    renderCard(qi);
+  });
+  updateProgress();
+  list.addEventListener("click", function (e) {
+    var chip = e.target.closest(".chip");
+    if (chip) {
+      var qi = Number(chip.getAttribute("data-q")), si = Number(chip.getAttribute("data-s"));
+      document.getElementById("i" + qi + "_" + si).value = chip.getAttribute("data-v");
+      tryAnswer(qi, si, chip.getAttribute("data-v"));
+      return;
+    }
+    var reset = e.target.closest("[data-reset]");
+    if (reset) {
+      var r = Number(reset.getAttribute("data-reset"));
+      state[r] = { step: 0, done: false };
+      renderCard(r);
+      updateProgress();
+    }
+  });
+  list.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" || e.target.tagName !== "INPUT") return;
+    tryAnswer(Number(e.target.getAttribute("data-q")), Number(e.target.getAttribute("data-s")), e.target.value);
+  });
+}
+
+mount();
+</script>
+</body>
+</html>

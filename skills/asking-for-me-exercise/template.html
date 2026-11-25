@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>練習題</title>
+<style>
+  :root { --bg:#09090b; --panel:#111114; --line:#27272a; --soft:#18181b; --text:#fafafa; --muted:#a1a1aa; --ok:#22c55e; --bad:#ef4444; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; padding:40px 20px; }
+  .wrap { width:100%; max-width:760px; margin:0 auto; }
+  .top { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom:6px; }
+  h1 { font-size:28px; margin:0 0 6px; font-weight:600; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-size:15px; margin:0 0 6px; }
+  .source { color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:12px; margin:0 0 28px; }
+  .pickers { display:flex; gap:8px; flex-shrink:0; margin-top:6px; }
+  .picker { position:relative; flex-shrink:0; }
+  .picker-btn { display:inline-flex; gap:6px; align-items:center; background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:7px 12px; font-size:13px; cursor:pointer; font-family:inherit; }
+  .picker-btn:hover, .picker-btn[aria-expanded="true"] { border-color:#71717a; }
+  .picker-btn b { font-weight:600; }
+  .chev { color:var(--muted); }
+  .picker-menu { position:absolute; right:0; top:calc(100% + 6px); min-width:140px; background:#18181b; border:1px solid var(--line); border-radius:10px; padding:4px; box-shadow:0 8px 24px rgba(0,0,0,.4); z-index:10; }
+  .picker-menu[hidden] { display:none; }
+  .opt { padding:8px 10px; border-radius:6px; font-size:14px; cursor:pointer; color:var(--text); }
+  .opt:hover { background:#27272a; }
+  .opt[aria-selected="true"] { background:#3f3f46; font-weight:600; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:18px; }
+  .panel-head { display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); font-weight:600; font-size:15px; }
+  .badge { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; background:var(--text); color:var(--bg); font-size:13px; font-weight:700; }
+  .panel-body { padding:20px 18px; }
+  .prompt { font-size:16px; line-height:1.6; margin:0 0 18px; }
+  .schema { margin:0 0 22px; font-size:14px; line-height:1.7; }
+  .codeline { background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:16px; font-family:ui-monospace,Menlo,monospace; font-size:15px; line-height:2; white-space:pre-wrap; margin-bottom:16px; }
+  .blank { display:inline-flex; align-items:center; justify-content:center; min-width:120px; min-height:32px; padding:2px 10px; margin:0 4px; border:1px dashed #52525b; border-radius:6px; vertical-align:middle; cursor:pointer; background:var(--panel); color:var(--text); }
+  .blank.filled { border:1px solid #71717a; background:#27272a; }
+  .blank.ok { border-color:var(--ok); background:rgba(34,197,94,.12); }
+  .blank.bad { border-color:var(--bad); background:rgba(239,68,68,.12); }
+  .typebox { font-family:inherit; font-size:15px; min-width:140px; padding:2px 10px; margin:0 4px; border:1px solid #52525b; border-radius:6px; background:var(--panel); color:var(--text); vertical-align:middle; }
+  .typebox:focus { outline:none; border-color:var(--text); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+  .chip { background:var(--soft); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:7px 14px; font-family:ui-monospace,Menlo,monospace; font-size:14px; }
+  .chip:hover:not(:disabled) { border-color:#52525b; }
+  .chip.used, .chip:disabled { opacity:.35; cursor:default; }
+  .mode-drag .chip:not(:disabled) { cursor:grab; }
+  .mode-click .chip:not(:disabled) { cursor:pointer; }
+  .actions { display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:8px; }
+  .btn { border:1px solid var(--line); border-radius:8px; padding:8px 16px; font-size:14px; cursor:pointer; font-family:inherit; color:var(--text); background:transparent; }
+  .btn:hover { border-color:#52525b; }
+  .btn.primary { background:var(--text); color:var(--bg); border-color:var(--text); font-weight:600; }
+  .feedback { margin-top:14px; padding:12px 14px; border-radius:10px; font-size:14px; line-height:1.6; border:1px solid var(--line); background:var(--soft); }
+  .feedback.ok { border-color:var(--ok); }
+  .feedback.bad { border-color:var(--bad); }
+  .explain { margin-top:14px; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--soft); font-size:14px; line-height:1.75; white-space:pre-wrap; }
+  .footer { text-align:center; color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:12px; margin-top:32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1 id="page-title"></h1>
+      <p class="sub" id="page-sub"></p>
+      <p class="source" id="page-source"></p>
+    </div>
+    <div class="pickers">
+    <div class="picker" id="lang-picker">
+      <button class="picker-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false"><span id="lang-title">語言</span> <b id="lang-label">繁中</b> <span class="chev">⌄</span></button>
+      <div class="picker-menu" id="lang-menu" role="listbox" hidden>
+        <div class="opt" role="option" data-lang="zh" aria-selected="true">繁中</div>
+        <div class="opt" role="option" data-lang="en" aria-selected="false">English</div>
+      </div>
+    </div>
+    <div class="picker" id="picker">
+      <button class="picker-btn" id="picker-btn" aria-haspopup="listbox" aria-expanded="false"><span id="mode-title">輸入方式</span> <b id="picker-label">點擊</b> <span class="chev">⌄</span></button>
+      <div class="picker-menu" id="picker-menu" role="listbox" hidden>
+        <div class="opt" role="option" data-mode="type" aria-selected="false">打字</div>
+        <div class="opt" role="option" data-mode="drag" aria-selected="false">拖曳</div>
+        <div class="opt" role="option" data-mode="click" aria-selected="true">點擊</div>
+      </div>
+    </div>
+    </div>
+  </div>
+  <pre class="codeline schema" id="page-schema" hidden></pre>
+  <div id="list"></div>
+  <div class="footer">Interactive exercises · offline · open in any browser</div>
+</div>
+<script>
+var PAGE = {
+  title: "Java 練習",
+  sub: "選擇輸入方式，把正確的字填入空格，再按「檢查答案」。",
+  source: "source OOP 基礎 · 練習用"
+};
+var EXERCISES = [
+  { title: "建立物件", prompt: "把正確的關鍵字填入空格，建立 Dog 類別的物件。",
+    code: "Dog d = ___ Dog();",
+    options: ["new", "class", "void", "this"],
+    answer: "new",
+    why: "new 會依照類別建立物件。" },
+  { title: "繼承", prompt: "把正確的關鍵字填入空格，讓 Cat 繼承 Animal。",
+    code: "class Cat ___ Animal {}",
+    options: ["extends", "implements", "new", "static"],
+    answer: "extends",
+    why: "類別繼承另一個類別要用 extends。" }
+];
+
+var mode = "click";
+var state = EXERCISES.map(function () { return null; });
+var locked = EXERCISES.map(function () { return false; });
+var result = EXERCISES.map(function () { return null; });
+var explainOpen = EXERCISES.map(function () { return false; });
+var list = document.getElementById("list");
+
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+function renderEx(i) {
+  var ex = EXERCISES[i], v = state[i], res = result[i], lk = locked[i];
+  var parts = ex.code.split("___");
+  var blank;
+  if (mode === "type") {
+    var cls = "typebox" + (res === "ok" ? " ok" : res === "bad" ? " bad" : "");
+    blank = '<input class="' + cls + '" data-act="input" data-i="' + i + '" value="' + esc(v || "") + '"' + (lk ? " disabled" : "") + ' autocomplete="off" spellcheck="false" placeholder="' + esc(S("placeholder")) + '">';
+  } else {
+    var blankCls = "blank" + (v !== null ? " filled" : "") + (res === "ok" ? " ok" : res === "bad" ? " bad" : "");
+    blank = '<span class="' + blankCls + '" data-act="blank" data-i="' + i + '">' + (v !== null ? esc(v) : "&nbsp;") + "</span>";
+  }
+  var chips = "";
+  if (mode !== "type") {
+    chips = '<div class="chips">' + ex.options.map(function (o) {
+      var used = v === o;
+      return '<button class="chip' + (used ? " used" : "") + '" data-act="chip" data-i="' + i + '" data-v="' + esc(o) + '" draggable="' + (mode === "drag" ? "true" : "false") + '"' + (lk || used ? " disabled" : "") + ">" + esc(o) + "</button>";
+    }).join("") + "</div>";
+  }
+  var fb = "";
+  if (res === "empty") fb = '<div class="feedback">' + esc(S("empty")) + "</div>";
+  else if (res === "ok") fb = '<div class="feedback ok">' + esc(S("ok")) + esc(T(ex.why)) + "</div>";
+  else if (res === "bad") fb = '<div class="feedback bad">' + esc(S("bad")) + esc(ex.answer) + esc(S("end")) + esc(T(ex.why)) + "</div>";
+  var btn = lk
+    ? '<button class="btn" data-act="retry" data-i="' + i + '">' + esc(S("retry")) + "</button>"
+    : '<button class="btn primary" data-act="check" data-i="' + i + '">' + esc(S("check")) + "</button>";
+  var explainBtn = '<button class="btn" data-act="explain" data-i="' + i + '">' + (explainOpen[i] ? S("hide") : S("explain")) + "</button>";
+  var explainHtml = explainOpen[i] ? '<div class="explain">' + esc(T(ex.explain || ex.why)) + "</div>" : "";
+  document.getElementById("ex-" + i).innerHTML =
+    '<div class="panel-head"><span class="badge">' + String.fromCharCode(65 + i) + "</span>" + esc(T(ex.title)) + "</div>" +
+    '<div class="panel-body"><p class="prompt">' + esc(T(mode === "type" && ex.typePrompt ? ex.typePrompt : ex.prompt)) + "</p>" +
+    '<div class="codeline">' + esc(parts[0]) + blank + esc(parts[1] || "") + "</div>" +
+    chips +
+    '<div class="actions">' + explainBtn + btn + "</div>" + fb + explainHtml + "</div>";
+}
+
+function renderAll() {
+  list.className = "mode-" + mode;
+  EXERCISES.forEach(function (ex, i) { renderEx(i); });
+}
+
+var LANG = "zh";
+var STR = {
+  zh: { mode: "輸入方式", lang: "語言", type: "打字", drag: "拖曳", click: "點擊", check: "檢查答案", retry: "重試", explain: "詳解", hide: "收起詳解", empty: "先輸入或選一個答案。", ok: "答對了。", bad: "答錯了。正確答案是 ", end: "。", placeholder: "輸入答案" },
+  en: { mode: "Input", lang: "Language", type: "Type", drag: "Drag", click: "Click", check: "Check answer", retry: "Retry", explain: "Explain", hide: "Hide explanation", empty: "Type or choose an answer first.", ok: "Correct. ", bad: "Incorrect. The answer is ", end: ".", placeholder: "Type answer" }
+};
+function S(k) { return STR[LANG][k]; }
+// Text fields may be a plain string or { en: "...", zh: "..." }.
+function T(v) { return (v && typeof v === "object") ? (v[LANG] || v.en) : v; }
+function applyChrome() {
+  document.documentElement.lang = LANG === "zh" ? "zh-TW" : "en";
+  document.getElementById("page-title").textContent = T(PAGE.title);
+  document.getElementById("page-sub").textContent = T(PAGE.sub);
+  document.getElementById("page-source").textContent = T(PAGE.source);
+  var sc = document.getElementById("page-schema");
+  if (PAGE.schema) { sc.textContent = T(PAGE.schema); sc.hidden = false; }
+  document.getElementById("mode-title").textContent = S("mode");
+  document.getElementById("lang-title").textContent = S("lang");
+  document.getElementById("picker-label").textContent = S(mode);
+  document.getElementById("lang-label").textContent = LANG === "zh" ? "繁中" : "English";
+  document.querySelectorAll("#picker-menu .opt").forEach(function (o) { o.textContent = S(o.getAttribute("data-mode")); });
+}
+
+function setMode(m) {
+  mode = m;
+  state = EXERCISES.map(function () { return null; });
+  locked = EXERCISES.map(function () { return false; });
+  result = EXERCISES.map(function () { return null; });
+  applyChrome();
+  document.querySelectorAll("#picker-menu .opt").forEach(function (o) {
+    o.setAttribute("aria-selected", String(o.getAttribute("data-mode") === m));
+  });
+  renderAll();
+}
+
+function togglePicker(open) {
+  var menu = document.getElementById("picker-menu");
+  var btn = document.getElementById("picker-btn");
+  var show = open === undefined ? menu.hidden : open;
+  menu.hidden = !show;
+  btn.setAttribute("aria-expanded", String(show));
+}
+
+function mount() {
+  document.getElementById("page-title").textContent = T(PAGE.title);
+  document.getElementById("page-sub").textContent = T(PAGE.sub);
+  document.getElementById("page-source").textContent = T(PAGE.source);
+  EXERCISES.forEach(function (ex, i) {
+    var div = document.createElement("div");
+    div.className = "panel";
+    div.id = "ex-" + i;
+    list.appendChild(div);
+  });
+  document.getElementById("picker-btn").addEventListener("click", function (e) {
+    e.stopPropagation();
+    togglePicker();
+  });
+  document.querySelectorAll("#picker-menu .opt").forEach(function (o) {
+    o.addEventListener("click", function (e) {
+      e.stopPropagation();
+      setMode(o.getAttribute("data-mode"));
+      togglePicker(false);
+    });
+  });
+  document.addEventListener("click", function () { togglePicker(false); });
+  renderAll();
+}
+
+list.addEventListener("click", function (e) {
+  var el = e.target.closest("[data-act]");
+  if (!el) return;
+  var i = Number(el.getAttribute("data-i"));
+  var act = el.getAttribute("data-act");
+  if (act === "chip" && mode === "click" && !locked[i]) { state[i] = el.getAttribute("data-v"); result[i] = null; }
+  else if (act === "blank" && !locked[i] && state[i] !== null) { state[i] = null; result[i] = null; }
+  else if (act === "check") {
+    var v = state[i] === null ? "" : String(state[i]).trim();
+    if (v === "") result[i] = "empty";
+    else { state[i] = v; locked[i] = true; result[i] = v === EXERCISES[i].answer ? "ok" : "bad"; }
+  }
+  else if (act === "retry") { state[i] = null; locked[i] = false; result[i] = null; }
+  else if (act === "explain") { explainOpen[i] = !explainOpen[i]; }
+  else return;
+  renderEx(i);
+});
+
+list.addEventListener("input", function (e) {
+  var el = e.target;
+  if (el.getAttribute("data-act") !== "input") return;
+  var i = Number(el.getAttribute("data-i"));
+  if (locked[i]) return;
+  state[i] = el.value;
+  result[i] = null;
+});
+
+list.addEventListener("keydown", function (e) {
+  var el = e.target;
+  if (el.getAttribute("data-act") !== "input" || e.key !== "Enter") return;
+  var i = Number(el.getAttribute("data-i"));
+  if (locked[i]) return;
+  var v = String(el.value).trim();
+  if (v === "") result[i] = "empty";
+  else { state[i] = v; locked[i] = true; result[i] = v === EXERCISES[i].answer ? "ok" : "bad"; }
+  renderEx(i);
+});
+
+list.addEventListener("dragstart", function (e) {
+  var el = e.target.closest('[data-act="chip"]');
+  if (el && mode === "drag") e.dataTransfer.setData("text/plain", el.getAttribute("data-v"));
+});
+list.addEventListener("dragover", function (e) {
+  var b = e.target.closest('[data-act="blank"]');
+  if (mode === "drag" && b && !locked[Number(b.getAttribute("data-i"))]) e.preventDefault();
+});
+list.addEventListener("drop", function (e) {
+  var b = e.target.closest('[data-act="blank"]');
+  if (!b || mode !== "drag") return;
+  e.preventDefault();
+  var i = Number(b.getAttribute("data-i"));
+  var val = e.dataTransfer.getData("text/plain");
+  if (locked[i] || EXERCISES[i].options.indexOf(val) === -1) return;
+  state[i] = val; result[i] = null;
+  renderEx(i);
+});
+
+function toggleLang(open) {
+  var menu = document.getElementById("lang-menu");
+  var show = open === undefined ? menu.hidden : open;
+  menu.hidden = !show;
+  document.getElementById("lang-btn").setAttribute("aria-expanded", String(show));
+}
+
+document.getElementById("lang-btn").addEventListener("click", function (e) {
+  e.stopPropagation();
+  toggleLang();
+});
+document.querySelectorAll("#lang-menu .opt").forEach(function (o) {
+  o.addEventListener("click", function (e) {
+    e.stopPropagation();
+    LANG = o.getAttribute("data-lang");
+    document.querySelectorAll("#lang-menu .opt").forEach(function (x) {
+      x.setAttribute("aria-selected", String(x === o));
+    });
+    toggleLang(false);
+    applyChrome();
+    renderAll();
+  });
+});
+document.addEventListener("click", function () { toggleLang(false); });
+
+applyChrome();
+mount();
+</script>
+</body>
+</html>

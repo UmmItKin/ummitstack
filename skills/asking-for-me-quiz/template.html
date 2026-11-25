@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OOP 互動測驗</title>
+<style>
+  :root { --bg:#09090b; --panel:#111114; --line:#27272a; --soft:#18181b; --text:#fafafa; --muted:#a1a1aa; --ok:#22c55e; --bad:#ef4444; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif; padding:40px 20px; }
+  .wrap { width:100%; max-width:760px; margin:0 auto; }
+  h1 { font-size:28px; margin:0 0 6px; font-weight:600; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-size:15px; margin:0 0 6px; }
+  .source { color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:12px; margin:0 0 28px; }
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .panel-head { display:flex; align-items:center; gap:12px; padding:14px 18px; border-bottom:1px solid var(--line); font-weight:600; font-size:15px; }
+  .badge { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; background:var(--text); color:var(--bg); font-size:13px; font-weight:700; }
+  .panel-body { padding:20px 18px; }
+  .progress { color:var(--muted); font-size:13px; margin-bottom:10px; font-family:ui-monospace,Menlo,monospace; }
+  .bar { height:3px; background:var(--line); border-radius:3px; margin-bottom:22px; overflow:hidden; }
+  .bar > div { height:100%; background:var(--text); transition:width .3s; }
+  .question { font-size:18px; line-height:1.6; margin:0 0 18px; font-weight:500; }
+  .qcode { font-family:ui-monospace,Menlo,monospace; font-size:14px; line-height:1.6; background:#18181b; border:1px solid #27272a; border-radius:10px; padding:14px 16px; margin:0 0 18px; white-space:pre; overflow-x:auto; color:#e4e4e7; }
+  .option { display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left; background:var(--soft); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:13px 15px; margin-bottom:10px; font-size:15px; line-height:1.55; cursor:pointer; font-family:inherit; transition:border-color .15s, background .15s; }
+  .option:hover:not(:disabled) { border-color:#52525b; }
+  .option .letter { font-family:ui-monospace,Menlo,monospace; font-weight:700; color:var(--muted); min-width:22px; }
+  .option.correct { border-color:var(--ok); background:rgba(34,197,94,.12); }
+  .option.wrong { border-color:var(--bad); background:rgba(239,68,68,.12); }
+  .option:disabled { cursor:default; }
+  .feedback { margin-top:10px; padding:12px 14px; border-radius:10px; font-size:14px; line-height:1.6; display:none; border:1px solid var(--line); background:var(--soft); }
+  .feedback.ok { display:block; border-color:var(--ok); }
+  .feedback.bad { display:block; border-color:var(--bad); }
+  .hint { margin-top:10px; padding:12px 14px; border-radius:10px; background:#27272a; border:1px solid #3f3f46; color:#e4e4e7; font-size:15px; line-height:1.6; display:none; }
+  .hint.show { display:block; }
+  .actions { display:flex; justify-content:space-between; align-items:center; margin-top:20px; gap:8px; }
+  .btn { border:1px solid var(--line); border-radius:8px; padding:8px 16px; font-size:14px; cursor:pointer; font-family:inherit; color:var(--text); background:transparent; }
+  .btn:hover:not(:disabled) { border-color:#52525b; }
+  .btn:disabled { opacity:.35; cursor:default; }
+  .btn.primary { background:var(--text); color:var(--bg); border-color:var(--text); font-weight:600; }
+  .result h2 { margin:0 0 4px; font-size:22px; font-weight:600; }
+  .score { font-size:44px; font-weight:700; margin:10px 0 6px; font-family:ui-monospace,Menlo,monospace; }
+  .review { list-style:none; padding:0; margin:14px 0 0; }
+  .review li { display:flex; gap:10px; padding:11px 0; border-top:1px solid var(--line); font-size:14px; line-height:1.55; }
+  .mark { font-weight:700; min-width:18px; font-family:ui-monospace,Menlo,monospace; }
+  .mark.ok { color:var(--ok); }
+  .mark.bad { color:var(--bad); }
+  .muted { color:var(--muted); font-size:14px; }
+  .footer { text-align:center; color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:12px; margin-top:32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>物件導向 測驗</h1>
+  <p class="sub">10 題單選，點選後會立即顯示答案和原因</p>
+  <p class="source">source OOP 基礎 · 練習用</p>
+  <div class="panel">
+    <div class="panel-head"><span class="badge">A</span>測驗</div>
+    <div class="panel-body" id="app"></div>
+  </div>
+  <div class="footer">Interactive quiz · offline · open in any browser</div>
+</div>
+<script>
+var QUESTIONS = [
+  { q: "在 Java 中，class 和 object 的關係是什麼？",
+    options: ["object 是定義資料型態的結構，class 是執行時配置的記憶體實體",
+              "class 是物件的設計藍圖，object 是 class 的實例",
+              "一個 class 在程式執行過程中只能建立出一個 object",
+              "宣告物件變數（例如 BankAccount acc;）時就會自動在記憶體中建立物件內容"],
+    answer: 1,
+    hint: "先想一想：藍圖和實際做出來的東西，哪一個是哪一個？",
+    why: "class 是藍圖，object 是依照藍圖建立的實例。宣告變數本身不會建立物件。" },
+  { q: "下面哪一個存取修飾詞只允許在同一個類別內使用欄位？",
+    options: ["public", "protected", "private", "不寫修飾詞"],
+    answer: 2,
+    hint: "名字的意思是「私人的」。",
+    why: "private 只允許同一個類別內存取。" },
+  { q: "什麼是建構子（constructor）？",
+    options: ["在建立物件時自動執行的特殊方法", "只能定義在介面中的方法", "一個 static 變數", "一種資料型別"],
+    answer: 0,
+    hint: "想一想 new 之後，最先會執行的是什麼。",
+    why: "建構子在物件建立時自動執行，通常用來初始化資料。" },
+  { q: "下面哪一項是方法多載（method overloading）？",
+    options: ["兩個方法同名，參數列表完全相同",
+              "同一個類別中兩個方法同名，但參數列表不同",
+              "子類別取代父類別的方法",
+              "方法呼叫它自己"],
+    answer: 1,
+    hint: "多載的關鍵是：名字相同，但參數不同。",
+    why: "多載發生在同一個類別中，方法名稱相同但參數列表不同。" },
+  { q: "在 class Cat extends Animal 中，Animal 是什麼？",
+    options: ["子類別", "介面", "常數", "父類別"],
+    answer: 3,
+    hint: "extends 後面的類別，是被繼承的那一個。",
+    why: "extends 後面的類別是父類別，Cat 是子類別。" },
+  { q: "子類別建構子中的 super() 有什麼作用？",
+    options: ["呼叫父類別的建構子", "刪除父類別的物件", "建立一個新的類別", "把方法變成 static"],
+    answer: 0,
+    hint: "super 指的是父類別。",
+    why: "super() 會呼叫父類別的建構子，讓父類別先完成初始化。" },
+  { q: "下面哪一項正確描述 Java 的介面（interface）？",
+    options: ["只能有 private 欄位和有本體的方法",
+              "是用 new 建立的物件",
+              "定義一組實作類別必須提供的方法",
+              "不能有任何方法"],
+    answer: 2,
+    hint: "介面像一份合約，規定要有哪些方法。",
+    why: "介面規定方法的形式，由實作它的類別提供內容。" },
+  { q: "下面哪一項關於 static 欄位的說法正確？",
+    options: ["每個物件各自有一份", "屬於類別本身，所有物件共用", "只能是 int 型別", "建立物件後就會被刪除"],
+    answer: 1,
+    hint: "static 的意思是「屬於整個類別」，不是屬於某個物件。",
+    why: "static 欄位屬於類別，所有物件共用同一份。" },
+  { q: "下面哪一項最能描述 getter 方法？",
+    options: ["回傳一個 private 欄位的值", "改變類別的名稱", "刪除一個欄位", "建立一個新物件"],
+    answer: 0,
+    hint: "get 的意思是「取得」。",
+    why: "getter 用來安全地讀取 private 欄位的值。" },
+  { q: "為什麼要在方法上加 @Override？",
+    options: ["把方法變成 private", "讓方法回傳兩個值", "讓編譯器檢查這個方法是否真的覆寫父類別的方法", "把方法變成建構子"],
+    answer: 2,
+    hint: "想一想：如果方法名字拼錯，編譯器能不能發現？",
+    why: "@Override 讓編譯器檢查覆寫是否正確，拼錯時會報錯。" }
+];
+
+var LETTERS = ["A", "B", "C", "D"];
+var state = { index: 0, picked: [], showResult: false };
+
+function esc(s) { return s.replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+function render() {
+  var app = document.getElementById("app");
+  if (state.showResult) { renderResult(app); return; }
+  var total = QUESTIONS.length;
+  var i = state.index;
+  var q = QUESTIONS[i];
+  var chosen = state.picked[i];
+  var answered = chosen !== undefined;
+  var html = '';
+  html += '<div class="progress">' + (i + 1) + ' / ' + total + '</div>';
+  html += '<div class="bar"><div style="width:' + ((i + 1) / total * 100) + '%"></div></div>';
+  html += '<p class="question">' + esc(q.q) + '</p>';
+  if (q.code) html += '<pre class="qcode">' + esc(q.code) + '</pre>';
+  for (var k = 0; k < q.options.length; k++) {
+    var cls = 'option';
+    if (answered) {
+      if (k === q.answer) cls += ' correct';
+      else if (k === chosen) cls += ' wrong';
+    }
+    html += '<button class="' + cls + '" data-k="' + k + '"' + (answered ? ' disabled' : '') + '>'
+          + '<span class="letter">' + LETTERS[k] + '.</span><span>' + esc(q.options[k]) + '</span></button>';
+  }
+  html += '<div class="hint" id="hint">' + esc(q.hint) + '</div>';
+  if (answered) {
+    var ok = chosen === q.answer;
+    html += '<div class="feedback ' + (ok ? 'ok' : 'bad') + '">' + (ok ? '答對了！' : '答錯了。正確答案是 ' + LETTERS[q.answer] + '。') + ' ' + esc(q.why) + '</div>';
+  }
+  html += '<div class="actions">'
+        + '<div><button class="btn" id="hintBtn">提示</button></div>'
+        + '<div style="display:flex;gap:8px">'
+        + '<button class="btn" id="backBtn"' + (i === 0 ? ' disabled' : '') + '>返回</button>'
+        + '<button class="btn primary" id="nextBtn"' + (answered ? '' : ' disabled') + '>' + (i === total - 1 ? '查看結果' : '繼續') + '</button>'
+        + '</div></div>';
+  app.innerHTML = html;
+
+  var buttons = app.querySelectorAll('.option');
+  for (var b = 0; b < buttons.length; b++) {
+    buttons[b].addEventListener('click', onPick);
+  }
+  document.getElementById('hintBtn').addEventListener('click', function () {
+    document.getElementById('hint').classList.toggle('show');
+  });
+  document.getElementById('backBtn').addEventListener('click', function () {
+    if (state.index > 0) { state.index--; render(); }
+  });
+  document.getElementById('nextBtn').addEventListener('click', function () {
+    if (state.picked[state.index] === undefined) return;
+    if (state.index === total - 1) state.showResult = true; else state.index++;
+    render();
+  });
+}
+
+function onPick(e) {
+  var k = Number(e.currentTarget.getAttribute('data-k'));
+  if (state.picked[state.index] !== undefined) return;
+  state.picked[state.index] = k;
+  render();
+}
+
+function renderResult(app) {
+  var score = 0;
+  var rows = '';
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    var ok = state.picked[i] === QUESTIONS[i].answer;
+    if (ok) score++;
+    rows += '<li><span class="mark ' + (ok ? 'ok' : 'bad') + '">' + (ok ? '✓' : '✗') + '</span>'
+          + '<span>第 ' + (i + 1) + ' 題：' + esc(QUESTIONS[i].q) + '<br><span class="muted">正確答案：' + LETTERS[QUESTIONS[i].answer] + '．' + esc(QUESTIONS[i].options[QUESTIONS[i].answer]) + '</span></span></li>';
+  }
+  var pct = Math.round(score / QUESTIONS.length * 100);
+  var msg = pct === 100 ? '全部答對，很棒！' : pct >= 60 ? '不錯，再看看答錯的題目。' : '建議回頭複習 class、object 和繼承。';
+  app.innerHTML = '<div class="result">'
+    + '<h2>測驗完成</h2>'
+    + '<div class="muted">' + esc(msg) + '</div>'
+    + '<div class="score">' + score + ' / ' + QUESTIONS.length + '</div>'
+    + '<div class="muted">正確率 ' + pct + '%</div>'
+    + '<ul class="review">' + rows + '</ul>'
+    + '<div class="actions"><span></span><button class="btn primary" id="restartBtn">重新開始</button></div>'
+    + '</div>';
+  document.getElementById('restartBtn').addEventListener('click', function () {
+    state = { index: 0, picked: [], showResult: false };
+    render();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
