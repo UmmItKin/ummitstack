@@ -70,7 +70,7 @@ In Claude Code, the first commit of a session sets `"attribution": {"commit": ""
 <details>
 <summary><b>presentation-deck</b>: build a PowerPoint from SVG slides with ppt-master</summary>
 
-A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs the final quality gate, note split, SVG preview, PPTX and PDF export, then checks the counts. `references/build.md` has the manual commands, export flags, source layout and known traps.
+A build helper for ppt-master projects. `scripts/build.sh <project-dir>` runs the final quality gate, note split, SVG preview, PPTX and PDF export, then checks the counts. `references/build.md` has the manual commands, export flags, source layout and known traps. `references/diagrams.md` and `templates/` hold the diagram styles (zones, boundary, sequence, chevron flow, data model) to copy from, and `scripts/sequence.py` draws a sequence diagram from a JSON spec.
 
 </details>
 

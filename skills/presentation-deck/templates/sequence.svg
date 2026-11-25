@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="Pixelify Sans, ui-monospace, monospace" data-pptx-page-role="content">
+  <rect id="bg" data-pptx-role="background" x="0" y="0" width="1280" height="720" fill="#050A06" />
+  <g id="paper-grain" data-pptx-role="decoration" data-pptx-bounds="0 0 1280 720" fill="#185E2B" fill-opacity="0.35"><circle cx="1166" cy="31" r="1" /><circle cx="1091" cy="328" r="1.2" /><circle cx="881" cy="256" r="0.8" /><circle cx="787" cy="653" r="0.8" /><circle cx="710" cy="678" r="1" /><circle cx="1195" cy="232" r="0.8" /><circle cx="1211" cy="590" r="0.8" /><circle cx="807" cy="51" r="0.8" /><circle cx="212" cy="649" r="0.8" /><circle cx="398" cy="414" r="0.8" /><circle cx="149" cy="239" r="1.2" /><circle cx="296" cy="582" r="1" /><circle cx="91" cy="617" r="1" /><circle cx="39" cy="215" r="1" /><circle cx="971" cy="583" r="1" /><path d="M 0 182 C 214 172 394 190 604 178 C 854 166 1032 186 1280 172" fill="none" stroke="#185E2B" stroke-opacity="0.18" stroke-width="1" /></g>
+  <g id="header" data-pptx-bounds="64 50 631 112">
+    <rect x="64" y="52" width="4" height="16" fill="#FFBF00" />
+    <text x="76" y="64" font-weight="400" font-size="16" fill="#88C996" text-anchor="start">12  Web demo · CVEs</text>
+    <text x="64" y="124" font-weight="400" font-size="38" fill="#B8FFCC" text-anchor="start">sync CVEs and fetch PoCs</text>
+    <text x="64" y="156" font-weight="400" font-size="17" fill="#FFBF00" text-anchor="start">NVD imports records; Exploit-DB finds exact CVE matches</text>
+  </g>
+  <g id="sync-steps" data-pptx-bounds="64 213 505 308">
+    <text x="64" y="249" font-weight="400" font-size="28" fill="#FFBF00" text-anchor="start">01</text>
+    <text x="122" y="234" font-weight="400" font-size="24" fill="#B8FFCC" text-anchor="start">Sync from NVD</text>
+    <text x="122" y="264" font-weight="400" font-size="20" fill="#88C996" text-anchor="start">Use days, keyword or one CVE ID.</text>
+    <text x="122" y="289" font-weight="400" font-size="20" fill="#88C996" text-anchor="start">Existing records stay unchanged.</text>
+    <path d="M 64 329 Q 316.5 329.7 569 329" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1" />
+    <text x="64" y="374" font-weight="400" font-size="28" fill="#FFBF00" text-anchor="start">02</text>
+    <text x="122" y="359" font-weight="400" font-size="24" fill="#B8FFCC" text-anchor="start">Fetch PoCs</text>
+    <text x="122" y="389" font-weight="400" font-size="20" fill="#88C996" text-anchor="start">Choose Fetch or Fetch PoCs on a CVE.</text>
+    <path d="M 64 454 Q 316.5 454.6 569 454" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1" />
+    <text x="64" y="499" font-weight="400" font-size="28" fill="#FFBF00" text-anchor="start">03</text>
+    <text x="122" y="484" font-weight="400" font-size="24" fill="#B8FFCC" text-anchor="start">Check the banners</text>
+    <text x="122" y="514" font-weight="400" font-size="20" fill="#88C996" text-anchor="start">They report returned, added or matched.</text>
+  </g>
+
+  <g id="sync-flow" data-pptx-bounds="603 198 613 432">
+    <text x="680" y="236" font-size="20" fill="#B8FFCC" text-anchor="middle">Admin</text>
+    <path d="M 680 252 Q 680.6 426 680 600" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1.5" />
+    <text x="830" y="236" font-size="20" fill="#B8FFCC" text-anchor="middle">Express</text>
+    <path d="M 830 252 Q 829.3 426 830 600" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1.5" />
+    <text x="980" y="236" font-size="20" fill="#B8FFCC" text-anchor="middle">NVD / EDB</text>
+    <path d="M 980 252 Q 980.9 426 980 600" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1.5" />
+    <text x="1120" y="236" font-size="20" fill="#B8FFCC" text-anchor="middle">MongoDB</text>
+    <path d="M 1120 252 Q 1119.5 426 1120 600" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1.5" />
+    <path d="M 612.4 270.6 L 1208.3 271.4 L 1207.6 590.2 L 611.8 589.5 Z" stroke-linejoin="round" fill="none" stroke="#185E2B" stroke-width="1.5" />
+    <path d="M 612 432 Q 910 433.2 1208 432" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1.5" stroke-dasharray="6 6" />
+    <text x="1200" y="292" font-size="14" fill="#88C996" text-anchor="end">NVD sync</text>
+    <text x="1200" y="454" font-size="14" fill="#88C996" text-anchor="end">PoC fetch</text>
+    <path d="M 685 310 Q 755 310.6 825 310" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 815 304 L 825 310 L 815 316" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="755" y="302" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">POST /sync</text>
+    <path d="M 835 345 Q 905 344.2 975 345" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 965 339 L 975 345 L 965 351" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="905" y="337" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">NVD API</text>
+    <path d="M 835 380 Q 975 381.0 1115 380" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 1105 374 L 1115 380 L 1105 386" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="975" y="372" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">bulkWrite</text>
+    <path d="M 825 415 Q 755 414.4 685 415" fill="none" stroke-linecap="round" stroke="#88C996" stroke-width="1.5" />
+    <path d="M 695 409 L 685 415 L 695 421" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#88C996" stroke-width="1.5" />
+    <text x="755" y="407" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996" text-anchor="middle">notice</text>
+    <path d="M 685 475 Q 755 475.6 825 475" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 815 469 L 825 475 L 815 481" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="755" y="467" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">POST /pocs/sync</text>
+    <path d="M 835 510 Q 905 509.2 975 510" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 965 504 L 975 510 L 965 516" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="905" y="502" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">Exploit-DB</text>
+    <path d="M 835 545 Q 975 546.0 1115 545" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 1105 539 L 1115 545 L 1105 551" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="975" y="537" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00" text-anchor="middle">save pocs[]</text>
+    <path d="M 825 575 Q 755 574.4 685 575" fill="none" stroke-linecap="round" stroke="#88C996" stroke-width="1.5" />
+    <path d="M 695 569 L 685 575 L 695 581" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#88C996" stroke-width="1.5" />
+    <text x="755" y="567" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996" text-anchor="middle">notice</text>
+    <text x="612" y="620" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996"># NVD inserts missing ids. Raw PoC code is escaped.</text>
+  </g>
+  <g id="source-line" data-pptx-bounds="64 635 541 17">
+    <text x="64" y="647" font-family="Share Tech Mono, ui-monospace, monospace" font-weight="400" font-size="14" fill="#FFBF00" text-anchor="start">Implementation · POST /sync · POST /cves/:id/pocs/sync</text>
+  </g>
+  <g id="footer" data-pptx-bounds="1169 672 47 17" data-pptx-role="footer">
+    <text x="1216" y="684" font-weight="400" font-size="13" fill="#88C996" text-anchor="end">13 / 21</text>
+  </g>
+</svg>

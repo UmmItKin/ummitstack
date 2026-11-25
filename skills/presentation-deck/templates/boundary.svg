@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" font-family="Pixelify Sans, ui-monospace, monospace" data-pptx-page-role="content">
+  <rect id="bg" data-pptx-role="background" x="0" y="0" width="1280" height="720" fill="#050A06" />
+  <g id="paper-grain" data-pptx-role="decoration" data-pptx-bounds="0 0 1280 720" fill="#185E2B" fill-opacity="0.35"><circle cx="1166" cy="31" r="1" /><circle cx="1091" cy="328" r="1.2" /><circle cx="881" cy="256" r="0.8" /><circle cx="787" cy="653" r="0.8" /><circle cx="710" cy="678" r="1" /><circle cx="1195" cy="232" r="0.8" /><circle cx="1211" cy="590" r="0.8" /><circle cx="807" cy="51" r="0.8" /><circle cx="212" cy="649" r="0.8" /><circle cx="398" cy="414" r="0.8" /><circle cx="149" cy="239" r="1.2" /><circle cx="296" cy="582" r="1" /><circle cx="91" cy="617" r="1" /><circle cx="39" cy="215" r="1" /><circle cx="971" cy="583" r="1" /><path d="M 0 182 C 214 172 394 190 604 178 C 854 166 1032 186 1280 172" fill="none" stroke="#185E2B" stroke-opacity="0.18" stroke-width="1" /></g>
+  <g id="header" data-pptx-bounds="64 50 614 112">
+    <rect x="64" y="52" width="4" height="16" fill="#FFBF00" />
+    <text x="76" y="64" font-weight="400" font-size="16" fill="#88C996" text-anchor="start">04  Project and team</text>
+    <text x="64" y="124" font-weight="400" font-size="38" fill="#B8FFCC" text-anchor="start">what cvedb manages</text>
+    <text x="64" y="156" font-weight="400" font-size="17" fill="#FFBF00" text-anchor="start">One application for vulnerability records and disclosed data breaches</text>
+  </g>
+  <g id="actors" data-pptx-bounds="64 200 240 390">
+    <circle cx="104" cy="226" r="14" fill="none" stroke="#B8FFCC" stroke-width="1.5" />
+    <path d="M 104 240 Q 105.2 264 104 290 M 80 256 Q 104 254.6 128 256 M 104 290 L 87 322 M 104 290 L 121 322" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B8FFCC" stroke-width="1.5" />
+    <text x="64" y="352" font-size="20" fill="#B8FFCC">Visitor</text>
+    <text x="64" y="374" font-size="14" fill="#88C996">public search, no login</text>
+    <circle cx="104" cy="430" r="14" fill="none" stroke="#B8FFCC" stroke-width="1.5" />
+    <path d="M 104 444 Q 102.9 468 104 494 M 80 460 Q 104 461.3 128 460 M 104 494 L 87 526 M 104 494 L 121 526" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#B8FFCC" stroke-width="1.5" />
+    <text x="64" y="556" font-size="20" fill="#B8FFCC">Admin</text>
+    <text x="64" y="578" font-size="14" fill="#88C996">CRUD, sync, session</text>
+    <path d="M 150 276 Q 236 274.8 322 276" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 312 270 L 322 276 L 312 282" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="236" y="262" font-size="14" fill="#88C996" text-anchor="middle">searches</text>
+    <path d="M 150 480 Q 236 481.2 322 480" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 312 474 L 322 480 L 312 486" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <text x="236" y="466" font-size="14" fill="#88C996" text-anchor="middle">manages</text>
+  </g>
+  <g id="system" data-pptx-bounds="330 200 562 400">
+    <path d="M 331.1 201.9 L 890.0 200.8 L 889.5 598.6 L 330.0 597.1 Z" stroke-linejoin="round" fill="#FFBF00" fill-opacity="0.06" stroke="#FFBF00" stroke-width="2" />
+    <text x="356" y="244" font-size="28" fill="#B8FFCC">cvedb</text>
+    <text x="356" y="270" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996">Express 5 · EJS · MongoDB</text>
+    <path d="M 356 290 Q 610 291.4 864 290" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1" />
+    <text x="356" y="330" font-size="20" fill="#B8FFCC">Public home</text>
+    <text x="356" y="352" font-size="14" fill="#88C996">search NVD CVEs</text>
+    <text x="616" y="330" font-size="20" fill="#B8FFCC">REST API</text>
+    <text x="616" y="352" font-size="14" fill="#88C996">public JSON for both datasets</text>
+    <text x="356" y="410" font-size="20" fill="#B8FFCC">Admin CRUD</text>
+    <text x="356" y="432" font-size="14" fill="#88C996">CVE and breach records</text>
+    <text x="616" y="410" font-size="20" fill="#B8FFCC">Session guard</text>
+    <text x="616" y="432" font-size="14" fill="#88C996">password or Google</text>
+    <text x="356" y="490" font-size="20" fill="#B8FFCC">NVD sync · PoC fetch</text>
+    <text x="356" y="512" font-size="14" fill="#88C996">admin buttons call the external services</text>
+    <path d="M 356 540 Q 610 538.8 864 540" fill="none" stroke-linecap="round" stroke="#185E2B" stroke-width="1" />
+    <text x="356" y="570" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00">Cve · Breach · User · NvdSync</text>
+  </g>
+  <g id="external" data-pptx-bounds="892 200 324 380">
+    <text x="958" y="214" font-size="14" fill="#88C996">external services</text>
+    <path d="M 958.4 226.7 L 1215.2 225.6 L 1216.1 305.4 L 957.8 306.2 Z" stroke-linejoin="round" fill="none" stroke="#88C996" stroke-width="1.5" />
+    <text x="978" y="258" font-size="20" fill="#B8FFCC">NVD API 2.0</text>
+    <text x="978" y="284" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996">sync recent CVEs</text>
+    <path d="M 957.6 360.2 L 1216.3 361.1 L 1215.6 440.6 L 958.5 439.4 Z" stroke-linejoin="round" fill="none" stroke="#88C996" stroke-width="1.5" />
+    <text x="978" y="392" font-size="20" fill="#B8FFCC">Exploit-DB</text>
+    <text x="978" y="418" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996">exact CVE PoCs</text>
+    <path d="M 958.9 494.5 L 1215.7 493.6 L 1216.2 574.3 L 957.9 573.4 Z" stroke-linejoin="round" fill="none" stroke="#88C996" stroke-width="1.5" />
+    <text x="978" y="526" font-size="20" fill="#B8FFCC">Google</text>
+    <text x="978" y="552" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#88C996">optional sign-in</text>
+    <path d="M 894 266 Q 922 265 950 266" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 940 260 L 950 266 L 940 272" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 894 400 Q 922 401 950 400" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 940 394 L 950 400 L 940 406" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 894 534 Q 922 533 950 534" fill="none" stroke-linecap="round" stroke="#FFBF00" stroke-width="1.5" />
+    <path d="M 940 528 L 950 534 L 940 540" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#FFBF00" stroke-width="1.5" />
+  </g>
+  <g id="source-line" data-pptx-bounds="64 635 580 17">
+    <text x="64" y="647" font-family="Share Tech Mono, ui-monospace, monospace" font-size="14" fill="#FFBF00">Implementation · GET / · POST /sync · POST /cves/:id/pocs/sync</text>
+  </g>
+  <g id="footer" data-pptx-bounds="1169 672 47 17" data-pptx-role="footer">
+    <text x="1216" y="684" font-size="13" fill="#88C996" text-anchor="end">05 / 21</text>
+  </g>
+</svg>

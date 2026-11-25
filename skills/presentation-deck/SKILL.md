@@ -10,3 +10,5 @@ ppt-master converts one SVG per slide into native, editable PowerPoint shapes, n
 `scripts/build.sh <project-dir>` runs the pipeline in order and checks the counts: final quality gate, speaker notes, self-contained SVG preview, PPTX, PDF. It finds ppt-master's scripts at `~/.claude/skills/ppt-master/scripts`; set `PPT_MASTER_SCRIPTS` to override, and `PPT_MASTER_PYTHON` to pick the interpreter that has ppt-master's requirements installed.
 
 Read `references/build.md` for the manual commands, export flags, the source layout and the known traps.
+
+Before you draw or restyle any diagram, read `references/diagrams.md` and copy the nearest file from `templates/`. `scripts/sequence.py` generates sequence diagrams.
