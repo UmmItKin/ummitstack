@@ -151,6 +151,13 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 
 </details>
 
+<details>
+<summary><b>docx-reverse-pandoc</b>: edit a DOCX as Markdown and rebuild it with Pandoc</summary>
+
+`/docx-reverse-pandoc <file.docx> [out-dir]` reverses a DOCX into `doc.md`, a `reference.docx` and a `build.sh`, so you can edit plain text and rebuild a matching `.docx`. It puts back what Pandoc drops: page breaks, tabs, the table of contents, the page background colour, empty paragraphs, colours, sizes, fonts, alignment and spacing (as named styles), and for tables the exact widths, empty rows, shading, row heights and cell alignment. `scripts/inventory.py` summarises a DOCX without extracting it, lists the fonts it needs and which are missing on this machine, and compares a rebuild with the original. `scripts/render.sh` renders both with LibreOffice into one side-by-side image, because a passing compare once hid tables that drew wrongly. Caption numbers become plain text. It runs in nine phases with gates for fonts, structure, per-paragraph formatting and the rendered look, a property coverage ledger, and a run state validator; `sh skills/docx-reverse-pandoc/tests/run.sh` reproduces past mistakes. Needs `pandoc`; the render check needs LibreOffice.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
