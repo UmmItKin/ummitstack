@@ -1,6 +1,6 @@
 ---
 name: pdf-reverse-pandoc
-description: Reverse a text PDF into an editable Typst file that puts every line of text back where it was, with the same font, size, spacing and table lines, then rebuild the PDF and check it against the original in nine phases with gates for fonts, structure, per-line fidelity and the rendered look. Use when the user wants to edit the text of a PDF, rebuild a PDF that matches an existing one, or fill in a worksheet PDF without Word.
+description: Reverse a text PDF into an editable Typst file that puts every line of text back where it was, with the same font, size, spacing and table lines, then rebuild the PDF and check it against the original in nine phases with gates for fonts, structure, per-line fidelity and the rendered look. Use when the user wants to edit the text of any text PDF or rebuild a PDF so that it matches an existing one.
 ---
 
 # PDF reverse with Typst
