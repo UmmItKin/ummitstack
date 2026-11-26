@@ -193,6 +193,13 @@ After you rename or move a repo folder by hand and start a new session there, th
 
 </details>
 
+<details>
+<summary><b>list-claude-projects</b>: list your Claude Code projects and session titles</summary>
+
+`/list-claude-projects [filter]` lists every project under `~/.claude/projects` with its folder path and the title of each session, in two groups: titles you set with `/rename`, and the titles Claude made from what the session was doing. Sessions with neither are only counted, and folders that no longer exist are marked. It reads only the title fields and the working directory, never the conversation text. Claude Code only.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
