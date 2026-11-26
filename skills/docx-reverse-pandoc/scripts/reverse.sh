@@ -1,12 +1,6 @@
 #!/bin/sh
 # Usage: reverse.sh input.docx [out-dir] [--allow-missing-fonts]
-# The out-dir may already hold the files of phases 0 to 2 (run.json, findings.json, inventory-original.txt,
-# coverage.json) and nothing else.
-# Refuses to run when the text uses a font that is not installed, because every render and page count made
-# here would use a substitute. Install the fonts, or pass --allow-missing-fonts and say so in the report.
-# Creates out-dir with doc.md, media/, reference.docx (the input plus the styles Pandoc needs), build.sh, build.lua,
-# table-widths.txt, table-styles.txt, toc.xml (when there is a table of contents), extra-styles.xml, empty-paragraphs.txt,
-# postprocess.py and inventory-original.txt.
+# Exit 3: a text font is not installed and --allow-missing-fonts was not given.
 set -eu
 allow=no
 for a in "$@"; do [ "$a" = "--allow-missing-fonts" ] && allow=yes; done

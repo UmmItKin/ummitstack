@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Usage: leak_scan.py --source FILE [--source FILE ...] [--ignore PHRASE ...] (--staged | --history [REV-RANGE]) [--message TEXT]
-Checks that nothing from private source files (a .docx, .pdf or text file the user gave you) ended up in a commit.
-It reads every line of 14 or more characters (after collapsing spaces) from the sources, then searches the added lines of the staged diff
-(--staged, plus --message for the commit message) or of every commit in a range (--history, default all of HEAD).
-Lines are compared ignoring case and spacing, and only as whole words (a heading does not match inside a longer word). Prints the commit and the first 30 characters of each hit, never the
-whole line. Exit 1 on any hit. --ignore skips a phrase that is generic, such as a heading every document has."""
+Exit 1 on any hit.
+"""
 import re, subprocess, sys, zipfile
 
 

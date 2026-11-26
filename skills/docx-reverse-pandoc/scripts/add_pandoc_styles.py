@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """Usage: add_pandoc_styles.py reference.docx [extra-styles.xml]
-Adds to the reference document the styles Pandoc writes (Compact, Table Caption, First Paragraph and
-others) when the document does not define them, and appends extra-styles.xml when given. Without Compact, LibreOffice lays out Pandoc's table
-cells wrongly. Existing styles are never changed."""
+"""
 import io, os, re, subprocess, sys, zipfile
 
 

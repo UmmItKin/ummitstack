@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Usage: drop_alignment.py in.docx out.docx
-Copies a DOCX and removes the first centred alignment from its body, to test that the fidelity check notices."""
+"""
 import sys, zipfile
 
 src = zipfile.ZipFile(sys.argv[1])

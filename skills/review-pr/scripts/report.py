@@ -1,20 +1,5 @@
 #!/usr/bin/env python3
-"""Render a review-pr report (JSON on stdin) into one self-contained HTML page.
-Usage: report.py [-o out.html] < report.json   (prints the output path)
-
-JSON shape:
-{
-  "repo": "owner/name", "pr": 123, "title": "...", "author": "login",
-  "url": "https://github.com/owner/name/pull/123", "state": "OPEN",
-  "draft": false, "base": "main", "head": "feat/x",
-  "stats": {"files": 3, "additions": 40, "deletions": 5, "commits": 2},
-  "verdict": "good|caution|blocked", "summary": "one line, why",
-  "checks": [{"name": "CI", "status": "pass|fail|pending"}],
-  "findings": [{"severity": "high|med|low|info", "file": "src/a.ts",
-                "line": 12, "title": "...", "body": "..."}],
-  "screenshots": [{"path": "/tmp/shot.png", "caption": "Home at 1440 px"}],
-  "files": [{"path": "src/a.ts", "added": 10, "removed": 2, "diff": "@@ ..."}]
-}
+"""Usage: report.py [-o out.html] < report.json   (prints the output path)
 """
 import base64, datetime, html, json, os, sys
 

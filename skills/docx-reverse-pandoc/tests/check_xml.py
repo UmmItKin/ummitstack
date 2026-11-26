@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Usage: check_xml.py file.docx
-Exits 1 when any XML part does not parse, or a table cell has more than one tcPr (both were real mistakes)."""
+"""
 import re, sys, xml.dom.minidom as minidom, zipfile
 
 z = zipfile.ZipFile(sys.argv[1])

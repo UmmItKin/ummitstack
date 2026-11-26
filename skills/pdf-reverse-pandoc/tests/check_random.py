@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Usage: check_random.py scripts-dir temp-dir
-Runs random command sequences through run.py and compares run.py validate with a second, independent statement of
-the same rules (the rules in specs/pipeline.tla). Prints one PASS or FAIL line."""
+"""
 import json, os, random, subprocess, sys
 
 scripts, temp = sys.argv[1], sys.argv[2]
@@ -15,7 +14,6 @@ def run(*args):
 
 
 def model_ok(run_json, findings, folder):
-    """Same rules, written again: complete needs every phase done or skipped with artifacts, all gates, no open high or med."""
     if run_json["agents_used"] > run_json["budget"] or run_json["rounds"] > 3:
         return False
     open_early = False

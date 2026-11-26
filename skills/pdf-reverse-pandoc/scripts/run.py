@@ -3,18 +3,13 @@
   run.py init OUT-DIR --input FILE [--profile quick|standard|deep] [--budget N]
   run.py phase OUT-DIR PHASE pending|done|skipped|blocked|failed [note]
   run.py gates OUT-DIR            read gates.json (written by verify.py) into the run and print each gate
-  (phase done is refused until the phase artifact exists; report validates, writes REPORT.md, marks the report phase
-  done and sets the run complete, so it is the only command that completes a run)
   run.py finding OUT-DIR add PHASE high|med|low AREA EVIDENCE
   run.py finding OUT-DIR resolve ID fixed|accepted [reason]
   run.py stop OUT-DIR REASON      end the run as incomplete (use when a gate fails and nobody can decide)
   run.py agents OUT-DIR N         record that N subagents were used
   run.py validate OUT-DIR         check the run for consistency (exit 1 on any error)
   run.py report OUT-DIR           write REPORT.md from a valid run
-The phase list and the artifact each phase must leave are in phases.json beside this file; this file is the same in
-every skill that has one. Only this script writes run.json and findings.json. Phases, artifacts, gates and findings follow the same
-discipline as a coverage-led audit: a phase is done only when its artifact exists, and a run is complete only
-when every gate is recorded and no high or medium finding is open."""
+"""
 import json, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +31,6 @@ def save(out, name, data):
 
 
 def failing_gates(run, findings):
-    """Gates whose result is fail and that no accepted finding (area = gate name, with a reason) covers."""
     covered = {f["area"] for f in findings if f.get("state") == "accepted" and f.get("reason")}
     return [g for g, v in run.get("gates", {}).items() if v.get("result") == "fail" and g not in covered]
 

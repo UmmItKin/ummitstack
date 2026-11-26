@@ -1,7 +1,5 @@
 #!/bin/sh
-# Read-only SOC triage collector for any Linux. Changes nothing.
 # Usage: collect.sh [DAYS]   (DAYS = "recently modified" window, default 7)
-# Without root some owners/paths are hidden; the output says where.
 DAYS=${1:-7}
 have() { command -v "$1" >/dev/null 2>&1; }
 sec() { printf '\n=== %s ===\n' "$1"; }

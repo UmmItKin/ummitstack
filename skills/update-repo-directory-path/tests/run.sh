@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: sh tests/run.sh
-# Checks that migrate.py copies memory safely, using a temporary Claude folder only.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 m=$here/../scripts/migrate.py

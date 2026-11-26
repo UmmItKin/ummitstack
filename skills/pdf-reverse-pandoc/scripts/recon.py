@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Usage: recon.py original.pdf out-dir
-Phase 2. Reads the facts that decide whether the PDF can be reversed and writes out-dir/recon.json:
-pages, text layer, encryption, links, form fields, curves and pictures, fonts and which are installed.
-Exit 2: no text layer (scanned pages). Exit 1: encrypted. Exit 0: it can be reversed; the printed notes list what
-verify.py will refuse unless accepted (curves, pictures, links, form fields)."""
+Exit 2: no text layer. Exit 1: encrypted. Exit 0: it can be reversed.
+"""
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import graphics

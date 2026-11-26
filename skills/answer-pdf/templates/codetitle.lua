@@ -1,4 +1,3 @@
--- ```{.js title="server.js"} shows "server.js" in the box's title bar.
 function CodeBlock(el)
   local opt = ''
   local t = el.attributes.title
@@ -18,8 +17,6 @@ function Table(t)
   return t
 end
 
--- ```{.tree} with one entry per line, two spaces per level, folders ending in "/",
--- and an optional note after " # ". Becomes a forest folder tree with icons.
 local function tex(s)
   return (pandoc.write(pandoc.Pandoc { pandoc.Plain { pandoc.Str(s) } }, 'latex'):gsub('%s+$', ''))
 end
@@ -78,8 +75,6 @@ function CodeBlock(el)
   return codeblock(el)
 end
 
--- Long paths in body text (e.g. ~/your8DigitSID_exe02/task2/public) have no spaces,
--- so LaTeX cannot wrap them. Allow a line break after each "/".
 function Str(el)
   if #el.text < 20 or not el.text:find('/') then return nil end
   local out = {}

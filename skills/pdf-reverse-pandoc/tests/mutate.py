@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Usage: mutate.py doc.typ out.typ KIND
-Copies a generated doc.typ with one defect, so a test can check that the fidelity check notices it.
-KIND: size (a run gets a bigger size), word (a word changes), move (a run moves 12 pt down), shape (a line is removed),
-spacing (a run gets wide letter spacing)."""
+KIND: size, word, move, shape, spacing
+"""
 import re, sys
 
 src, dst, kind = sys.argv[1:]

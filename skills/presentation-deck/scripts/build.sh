@@ -1,6 +1,4 @@
 #!/bin/sh
-# Build an existing ppt-master project: final quality gate, notes, SVG preview,
-# PPTX export, PDF export, then check that all counts match the SVG count.
 # Usage: build.sh <project-dir>
 # Env: PPT_MASTER_SCRIPTS  ppt-master scripts dir (default ~/.claude/skills/ppt-master/scripts)
 #      PPT_MASTER_PYTHON   interpreter with ppt-master's requirements (default python3)

@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Usage: check_run.py scripts-dir temp-dir
-Checks that run.py validate rejects the ways a run was once called complete without proof, and accepts a proper one.
-Prints one PASS or FAIL line per case."""
+"""
 import json, os, subprocess, sys
 
 scripts, temp = sys.argv[1], sys.argv[2]

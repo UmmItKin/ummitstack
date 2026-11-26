@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Usage: make_fixture.py out.pdf [--font NAME] [--scan] [--curve] [--link]
-Builds a small fictional A4 PDF with Typst: a title, bold and italic words, two sizes, a table and a second page.
---font picks the font (default: the system serif). --scan makes a PDF whose pages are pictures with no text layer. --curve adds a circle, which this workflow cannot redraw. --link adds a web link, which is not kept."""
+--font picks the font (default: the system serif). --scan makes a PDF whose pages are pictures with no text layer. --curve adds a circle. --link adds a web link.
+"""
 import os, shutil, subprocess, sys, tempfile
 
 BODY = """#set page(paper: "a4", margin: (x: 56pt, y: 60pt))

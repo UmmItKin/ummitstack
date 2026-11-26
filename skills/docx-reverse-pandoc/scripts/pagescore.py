@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Usage: pagescore.py original.pdf rebuilt.pdf work-dir
-Scores each page of two PDFs against each other (RMSE, 0 is identical, 1 is completely different) and prints
-a JSON object: page counts, how many pages are identical, mean, median and worst score, and the worst pages."""
+"""
 import glob, json, os, re, subprocess, sys
 
 

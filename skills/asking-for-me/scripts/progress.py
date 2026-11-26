@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
-"""Track right and wrong answers per concept.
-
-Usage:
+"""Usage:
   progress.py FILE record CONCEPT right|wrong
   progress.py FILE weak [N]        prints the N weakest concepts (default 3), one per line
-A concept never answered wrong is not weak. FILE is created on the first record.
 """
 import json, os, sys
 

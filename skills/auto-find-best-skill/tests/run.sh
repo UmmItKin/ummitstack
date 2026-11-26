@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: sh tests/run.sh
-# Checks that toggle.py adds and removes only its own hook and never damages the settings file.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 t=$here/../scripts/toggle.py

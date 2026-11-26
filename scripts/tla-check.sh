@@ -1,8 +1,5 @@
 #!/bin/sh
 # Usage: sh scripts/tla-check.sh
-# Model checks specs/pipeline.tla with TLC. The pinned tla2tools.jar is fetched once into ~/.cache/ummitstack (never into
-# this repo) and its SHA-256 is compared with the pin below. The pin was taken from the v1.7.4 release asset when this
-# script was written; the release publishes no checksum, so it guards against change, not against a bad first download.
 # Skips (exit 0, says so) when java or the network is missing.
 set -u
 cd "$(dirname "$0")/.."

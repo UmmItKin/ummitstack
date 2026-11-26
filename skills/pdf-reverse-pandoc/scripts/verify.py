@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 """Usage: verify.py original.pdf out-dir [--no-render] [--accept-unsupported]
-Runs the gates against out-dir/rebuilt.pdf and writes out-dir/gates.json:
-  fonts      the fonts the text uses and which are not installed here (a stand-in is used for those)
-  structure  the text layer exists, and no curves, pictures, links or form fields that this workflow does not keep
-  fidelity   fidelity.py: text, font, size, bold, italic, baseline, width, shapes, page count and size of every run
-  look       the pages rendered and scored against the original (needs pdftoppm and ImageMagick)
-Exit 0 when structure and fidelity pass and the look gate did not fail."""
+Exit 0 when structure and fidelity pass and the look gate did not fail.
+"""
 import json, os, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))

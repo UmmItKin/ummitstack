@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
-"""Turn off Claude Code's co-author trailer and PR attribution, once.
-
-Sets "attribution": {"commit": "", "pr": ""} in ~/.claude/settings.json
-(or the file given as the first argument) and keeps every other key.
-Prints "already set", "set" or an error. Safe to run again.
+"""Usage: no-coauthor.py [settings.json]
 """
 import json, os, sys
 

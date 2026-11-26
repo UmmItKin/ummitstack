@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """Usage: coverage.py original.docx [out-dir] [--accept unit,unit]
-The property coverage ledger. Lists every formatting property and structure the document uses, how many times,
-and what this workflow does with it: carried (put back by a script), native (Pandoc keeps it), ignorable, or
-unhandled (nothing keeps it). Writes coverage.json into out-dir. Exit 1 when an unhandled unit is present
-and not accepted, so a property can no longer be lost without anyone knowing."""
+Exit 1 when an unhandled unit is present and not accepted.
+"""
 import json, re, sys, zipfile
 from collections import Counter
 

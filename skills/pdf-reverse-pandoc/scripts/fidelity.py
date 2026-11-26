@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """Usage: fidelity.py original.pdf rebuilt.pdf [--tol PT] [--json out.json] [--accept-unsupported]
-Compares every text run of two PDFs: the text, the font family, the size, bold and italic, the position (left and top
-within --tol points, default 3) and the width (which shows letter spacing), and the page count and page size.
-Prints one FAIL line per kind of difference and a summary. Exit 1 when anything differs."""
+Exit 1 when anything differs.
+"""
 import json, os, sys
 from collections import Counter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

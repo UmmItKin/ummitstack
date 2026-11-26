@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: sh tests/run.sh
-# Reproduces the mistakes this skill once made and checks that each one is caught. Works in a new temporary folder.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 s=$here/../scripts

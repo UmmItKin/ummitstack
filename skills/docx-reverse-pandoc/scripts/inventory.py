@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Summarise a DOCX, or compare a rebuild with the original.
-
-Usage: inventory.py A.docx              print a summary of A
+"""Usage: inventory.py A.docx              print a summary of A
        inventory.py --widths A.docx     print the column widths of each table, one line per table
        inventory.py --missing-fonts A.docx   (the flag may come before or after the file) print the fonts the text needs that are not installed; exit 1 if any
        inventory.py A.docx B.docx       compare B (the rebuild) with A (the original)
        --tol 0.05                       relative tolerance for table column widths
-The zip is read in memory and nothing is extracted. Exit 1 when a compare finds a difference.
+Exit 1 when a compare finds a difference.
 """
 import re, subprocess, sys, zipfile
 import xml.etree.ElementTree as ET
@@ -45,7 +43,6 @@ def text_of(el):
 
 
 def font_usage(z):
-    """Font names used by styles, body text, headers and footers, with theme fonts resolved."""
     theme = z.read("word/theme/theme1.xml").decode("utf-8", "replace") if "word/theme/theme1.xml" in z.namelist() else ""
     def theme_font(kind):
         m = re.search(rf"<a:{kind}Font>\s*<a:latin typeface=\"([^\"]*)\"", theme)

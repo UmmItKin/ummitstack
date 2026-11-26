@@ -1,7 +1,5 @@
 #!/bin/sh
 # Usage: render.sh original.docx rebuilt.docx out-dir [first-page last-page]
-# Renders both files to PDF with LibreOffice, prints the page counts, and writes compare.png with the
-# original pages on the top row and the rebuilt pages on the bottom row (pages 1 to 4 by default).
 set -eu
 a=${1:?usage: render.sh original.docx rebuilt.docx out-dir [first last]}
 b=${2:?usage: render.sh original.docx rebuilt.docx out-dir [first last]}

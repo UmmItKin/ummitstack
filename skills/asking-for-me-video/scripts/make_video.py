@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
-"""Build an answer-me-with-html video whose narration is spoken by the Gemini TTS API.
-
-Usage:
+"""Usage:
   python3 make_video.py draft.md --out page.html [--voice Kore] [--model gemini-3.8-flash-tts]
-
-1. `am video` renders the draft with `--voice off` to get the scenes and one beat per `>` line.
-2. Each beat's text goes to the Gemini TTS API as WAV.
-3. The beat timings are rewritten to the real clip lengths, and the audio is replaced by the joined clips.
-The API key is read from $GEMINI_API_KEY or ~/.config/watch/.env. It is never printed.
 """
 import argparse, base64, json, os, pathlib, re, subprocess, sys, tempfile, time, urllib.request
 
@@ -78,10 +71,8 @@ ERROR_JS = """  const errWrap = document.createElement('div');
 
 
 def add_code_highlight(html):
-    # Limit: assumes each code line is one text node (true while the renderer does no syntax colouring)
     html, n = re.subn(r"(  function render\(time\) \{)", lambda m: CODE_JS + m.group(1), html, count=1)
     assert n == 1, "render() not found; the renderer changed"
-    # the renderer shows one step on the last beat; a code block must be there from the first, or early mentions hit a blank scene
     carried = "  const carried = new Set(morphs.map((m) => m.to));"
     assert carried in html, "renderer changed"
     html = html.replace(carried, carried + "\n  for (const it of items) if (it.el.matches('.am-codeblock')) it.at = segs[it.scene].beats[0].start;", 1)
@@ -92,7 +83,6 @@ def add_code_highlight(html):
 
 
 def rehash_csp(html):
-    """The page's CSP allows inline scripts by hash; recompute them after the scripts were edited, or the browser blocks the player."""
     import hashlib
     hashes = [base64.b64encode(hashlib.sha256(s.encode()).digest()).decode()
               for s in re.findall(r"<script>(.*?)</script>", html, re.S)]
@@ -102,13 +92,6 @@ def rehash_csp(html):
 
 
 def prepare_draft(text):
-    """Strip the video-only directives and tag each flagged beat with its scene's error text.
-
-    `>! text`   a narration beat that also shows the error card
-    `@error ...` the card text for the scene it sits in (one per scene)
-    Returns the clean draft, the error text per scene, and (beat index, scene) for each flagged beat.
-    The beat index counts `>` lines in order, which is the order the renderer makes beats in.
-    """
     out, errors, flagged, scene, beat = [], {}, [], 0, 0
     for line in text.splitlines():
         if line.startswith("## "):

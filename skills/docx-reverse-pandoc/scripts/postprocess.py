@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """Usage: postprocess.py reference.docx rebuilt.docx [table-widths.txt]
-Carries over what Pandoc drops: the page background colour from the reference document, and,
-when table-widths.txt is given, the exact table and cell widths of the original tables. It also takes the
-Compact style off paragraphs in table cells, and finally gives every paragraph with text the style and direct
-formatting it has in the reference document, matched by text (the list numbering Pandoc writes is kept), and
-puts back the empty table rows Pandoc drops, and sets the alignment of each cell, both from table-cells.txt next to
-the rebuilt file. Finally it sets the table look flags, indent and shading, the row heights and the cell shading
-from table-props.json. The whole table properties of the original are put back, so borders, margins and
-alignment come with them."""
+"""
 import difflib, html, json, os, re, sys, zipfile
 
 

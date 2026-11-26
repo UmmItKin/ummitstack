@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Usage: toggle.py on|off|status [--settings FILE]
-Turns the session hook of auto-find-best-skill on or off in the Claude Code settings file (default ~/.claude/settings.json).
-The hook is a SessionStart command that prints one reminder, so every new session starts with it in context.
-It changes nothing else: other settings and other hooks are kept, and running it twice gives the same file.
-A copy of the original file is kept once, next to it, as settings.json.before-auto-find-best-skill.
-Exit 1 when the settings file is not valid JSON; the file is then left as it was."""
+Exit 1 when the settings file is not valid JSON.
+"""
 import json, os, shlex, shutil, sys
 
 MARK = "auto-find-best-skill"

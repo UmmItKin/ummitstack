@@ -1,7 +1,5 @@
 #!/bin/sh
 # Usage: sh setup.sh
-# Checks the tools this skill needs and prints the command that installs what is missing. It never installs anything
-# and never runs sudo: copy the command yourself.
 need=""
 for t in pdftotext pdftohtml pdftocairo pdftoppm pdfinfo pdffonts pdfimages fc-match typst magick python3; do
   command -v "$t" >/dev/null 2>&1 || need="$need $t"

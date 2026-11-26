@@ -1,12 +1,7 @@
 #!/usr/bin/env python3
 """Usage: verify.py original.docx out-dir [--no-render]
-Runs the gates against out-dir/rebuilt.docx and writes out-dir/gates.json:
-  fonts      the fonts the text uses and which are missing here
-  structure  inventory.py compare plus coverage.py (unhandled units)
-  fidelity   fidelity.py, the effective formatting of every paragraph
-  look       the rendered pages, scored against the original (needs LibreOffice, pdftoppm and ImageMagick)
-Exit 0 when structure and fidelity pass and the page counts agree, otherwise 1. A missing renderer is not a
-failure; the look gate then says it was not verified."""
+Exit 0 when structure and fidelity pass and the page counts agree, otherwise 1.
+"""
 import json, os, shutil, subprocess, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))

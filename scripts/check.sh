@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: sh scripts/check.sh
-# The one check for this repo, run the same way locally and in CI.
 set -u
 cd "$(dirname "$0")/.."
 fail=0

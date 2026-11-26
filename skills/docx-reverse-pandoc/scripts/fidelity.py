@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Usage: fidelity.py original.docx rebuilt.docx [--json out.json]
-Compares the effective formatting of every paragraph that has text: alignment, spacing, indent, font, size,
-colour, bold, italic, capitals, character spacing and highlight. Effective means after the style chain and the
-document defaults, so a paragraph that only changed its style name does not count as a difference.
-Paragraphs are matched by their text. Exit 1 when any difference is found; each line names the property,
-the two values, how many paragraphs and a sample of the text."""
+Exit 1 when any difference is found.
+"""
 import difflib, json, re, sys, zipfile
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict

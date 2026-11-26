@@ -1,7 +1,5 @@
 #!/bin/sh
 # Usage: sh tests/run.sh
-# Reproduces the mistakes this skill and its sibling once made and checks that each one is caught.
-# Works in a new temporary folder and uses only generated PDFs.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 s=$here/../scripts

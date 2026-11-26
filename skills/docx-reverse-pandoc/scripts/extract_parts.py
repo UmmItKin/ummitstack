@@ -1,20 +1,6 @@
 #!/usr/bin/env python3
 """Usage: extract_parts.py original.docx out-dir
-Prepares what Pandoc cannot carry, writing into out-dir (tabs are marked like page breaks):
-  table-widths.txt     one line of column widths per table
-  table-styles.txt     one line per table with the id of its table style (empty when it has none)
-  table-props.json     per table: the whole table properties, and per row the row properties and per cell the
-                       cell properties (borders, shading, margins, alignment), which Pandoc drops
-  table-cells.txt      one line per table row, "---" between tables: R (has text) or E (empty row), then the
-                       alignment of each cell
-  toc.xml              the original table of contents, when there is one
-  source.docx          a reading copy of the original (see below)
-  extra-styles.xml     styles that stand for direct formatting, to add to the reference document
-  empty-paragraphs.txt the XML of each empty body paragraph, one per line
-The reading copy marks page breaks and empty paragraphs with placeholders, turns direct formatting of runs
-and paragraphs into named styles (DF1, DP1, ...), and replaces SEQ fields by their numbers, so Pandoc
-reads them as styles and text instead of dropping them. Caption paragraphs also get such a style, because
-Pandoc would otherwise treat a caption next to a table as the table's title and move it above the table."""
+"""
 import json, re, sys, zipfile, pathlib
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))

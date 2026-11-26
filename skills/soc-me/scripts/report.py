@@ -1,21 +1,5 @@
 #!/usr/bin/env python3
-"""Render a soc-me report (JSON on stdin) into one self-contained HTML page.
-Usage: report.py [-o out.html] < report.json   (prints the output path)
-
-JSON shape:
-{
-  "lang": "zh-Hant", "title": "...", "verdict": "clean|suspicious|compromised",
-  "summary": "one-line verdict", "meta": {"time": "...", "host": "...", "kernel": "..."},
-  "panels": [{"title": "...", "tone": "ok|warn|err|", "note": "...",
-              "copy": ["kill 1", "kill 2"],      (optional: "copy all" button in the section header)
-              "cols": ["PID", "..."], "rows": [["1", "`kill 1`", "no"]],
-              "items": ["plain line", "+ new", "- gone", "~ still"],
-              "cards": [{"title": "low Name", "body": "what it is and the risk", "cmd": ["line 1", "line 2"]}]}],
-}
-Text: `code` spans render as code anywhere in a string (one click selects a span).
-A leading ok / no / warn renders a status badge; a leading crit / high / med /
-low / info renders a severity label. Items starting with "+ ", "- ", "~ " get
-diff marks.
+"""Usage: report.py [-o out.html] < report.json   (prints the output path)
 """
 import base64, datetime, hashlib, html, json, os, sys
 from collections import namedtuple

@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 """Usage: make_fixture.py out.docx [--textbox] [--missing-font]
-Builds a small DOCX that has what a Pandoc round trip used to lose: a page background, a header, margins, a page
-break, a tab, an empty paragraph, direct run and paragraph formatting, a table with a whole table property block,
-cell shading, a row height, an empty row and a centred cell, and a SEQ caption below the table. The styles
-Compact and Table Caption are removed, as in a document that came from Word. --textbox adds a text box, which
-nothing keeps; --missing-font puts a font that is not installed into the text."""
+"""
 import re, subprocess, sys, zipfile
 
 NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"'

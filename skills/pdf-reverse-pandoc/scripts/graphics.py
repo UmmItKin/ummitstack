@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-"""Reads the vector drawing of a PDF (table lines, boxes, filled areas) through pdftocairo -svg.
-Straight-line shapes are returned as shapes in points from the top left corner of the page. Curves and pictures are
-counted as unsupported, because this workflow does not redraw them.
-Usage: graphics.py file.pdf     print the number of shapes and unsupported items per page"""
+"""Usage: graphics.py file.pdf     print the number of shapes and unsupported items per page
+"""
 import os, re, subprocess, sys, tempfile
 import xml.etree.ElementTree as ET
 
@@ -26,7 +24,6 @@ def color(value):
 
 
 def points(d):
-    """The points of a path made only of M, L, H, V and Z; None when it has anything else."""
     toks = re.findall(r"[A-Za-z]|-?[\d.]+(?:e-?\d+)?", d)
     pts, i, cmd, closed, cur = [], 0, None, False, (0.0, 0.0)
     while i < len(toks):
@@ -84,7 +81,6 @@ def page_shapes(svg):
 
 
 def glyph_origins(svg):
-    """The (x, y) of every glyph in the SVG; y is the baseline."""
     root = ET.parse(svg).getroot()
     out = []
 
@@ -103,7 +99,6 @@ def glyph_origins(svg):
 
 
 def attach_baselines(pgs, pdf):
-    """Adds run["base"], the baseline of each text run, which does not depend on the font metrics stored in the PDF."""
     with tempfile.TemporaryDirectory() as d:
         for n, pg in enumerate(pgs, 1):
             svg = os.path.join(d, f"b{n}.svg")
@@ -126,7 +121,6 @@ def attach_baselines(pgs, pdf):
 
 
 def pages(pdf, count):
-    """List of (shapes, unsupported count) per page. Glyphs live in defs and are skipped."""
     out = []
     with tempfile.TemporaryDirectory() as d:
         for n in range(1, count + 1):

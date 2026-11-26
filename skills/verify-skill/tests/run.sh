@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: sh tests/run.sh
-# Checks that static_check.py passes a good skill and fails each kind of bad one.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 s=$here/../scripts/static_check.py

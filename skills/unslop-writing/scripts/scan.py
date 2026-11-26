@@ -1,16 +1,6 @@
 #!/usr/bin/env python3
-"""Scan prose for common AI-writing tells.
-
-Usage: scan.py [--strong] [FILE ...]      (reads stdin when no file is given)
-
-Skips YAML front matter, fenced code, inline code and URLs, so only prose is
-checked. A file containing the marker <!-- unslop-ignore --> is skipped; use it
-on files that list the tells themselves.
-
-Each hit prints as  path:line:col strength id message: "text".
-strong = act on one sighting. weak = act only when several share a passage.
+"""Usage: scan.py [--strong] [FILE ...]      (reads stdin when no file is given)
 Exit status is 1 when any strong tell is found, otherwise 0.
-Patterns, causes and fixes are in references/patterns.md.
 """
 import re, sys
 from collections import namedtuple

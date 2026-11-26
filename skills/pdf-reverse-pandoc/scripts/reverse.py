@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 """Usage: reverse.py input.pdf out-dir [--allow-substitute-fonts]
-Turns a text PDF into out-dir/layout.json (every text run with its place, font and size), out-dir/doc.md (the text
-in reading order) and out-dir/doc.typ (a Typst file that puts every run back where it was). The runs are then
-measured in a trial rebuild and doc.typ gets a small correction for each run (position and letter spacing), so the
-rebuild lands on the original. Exit 2: the PDF has no text layer. Exit 3: a font used by the text is not installed
-and --allow-substitute-fonts was not given."""
+Exit 2: the PDF has no text layer. Exit 3: a font used by the text is not installed and --allow-substitute-fonts was not given.
+"""
 import json, os, shutil, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import graphics
@@ -15,7 +12,6 @@ SPACE_EM = 0.25
 
 
 def core(r):
-    """The text without leading and trailing spaces, and the width and left edge of just that text."""
     t = r["text"].strip()
     lead, trail = len(r["text"]) - len(r["text"].lstrip()), len(r["text"]) - len(r["text"].rstrip())
     return t, r["left"] + lead * SPACE_EM * r["size"], r["width"] - (lead + trail) * SPACE_EM * r["size"]
@@ -61,7 +57,6 @@ def compile_typ(src, pdf):
 
 
 def match(orig, rebuilt):
-    """Pair each original run with the nearest unused rebuilt run that has the same text."""
     used, pairs = set(), {}
     for i, o in enumerate(orig):
         best = None

@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 """Usage: static_check.py skill-dir
-Checks one skill folder without running it: the frontmatter, the files it points to, the scripts and the text.
-Prints ERROR and WARN lines. Exit 1 when there is any ERROR.
-Errors: frontmatter missing or not valid YAML, name different from the folder, description empty or over 1024
-characters, a script that does not compile, an em dash, an arrow or an emoji in the text,
-a home directory path or an email address in any file.
-Warnings: a script with no Usage line, a symbol such as a check mark, a script or reference that no other file mentions, a description without a "Use when" cue."""
+Exit 1 when there is any ERROR.
+"""
 import os, re, subprocess, sys
 
 DASHES_ARROWS_EMOJI = re.compile("[\u2014\u2192\u2190\u21d2\u27a1\u2b05\U0001f300-\U0001faff]")

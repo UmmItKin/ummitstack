@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""Shared helpers for reading a PDF with poppler: fonts, the text layer and the page runs.
-Imported by the other scripts; run it directly to print the facts about one PDF.
-Usage: pdfinfo.py file.pdf"""
+"""Usage: pdfinfo.py file.pdf
+"""
 import json, re, subprocess, sys
 import xml.etree.ElementTree as ET
 
@@ -17,14 +16,12 @@ def run(*args):
 
 
 def clean_family(name):
-    """TimesNewRomanPS-BoldMT or ABCDEF+TimesNewRomanPSMT -> Times New Roman."""
     name = re.sub(r"^[A-Z]{6}\+", "", name).split("-")[0].split(",")[0]
     name = re.sub(r"(PSMT|MT|PS)$", "", name)
     return re.sub(r"(?<=[a-z])(?=[A-Z])", " ", name).strip()
 
 
 def fonts(pdf):
-    """The fonts named in the PDF: family, whether embedded."""
     out, seen = [], set()
     for line in run("pdffonts", pdf).splitlines()[2:]:
         m = re.match(r"(\S+)\s+.*?\s(yes|no)\s+(yes|no)\s+(yes|no)\s+\d+\s+\d+\s*$", line)
@@ -35,13 +32,11 @@ def fonts(pdf):
 
 
 def installed(family):
-    """None when installed exactly, otherwise the name of the font that would stand in."""
     got = run("fc-match", "-f", "%{family}", family).split(",")[0].strip()
     return None if got.lower() == family.lower() else got
 
 
 def pages(pdf):
-    """Per page: width, height, and the text runs (text, left, top, width, height, family, size, bold, italic)."""
     root = ET.fromstring(run("pdftohtml", "-xml", "-i", "-zoom", str(ZOOM), "-stdout", pdf).split("?>", 1)[1].replace("<!DOCTYPE pdf2xml SYSTEM \"pdf2xml.dtd\">", ""))
     spec = {f.get("id"): (clean_family(f.get("family")), round(float(f.get("size")) / ZOOM, 2), f.get("color")) for f in root.iter("fontspec")}
     sizes = [(float(a), float(b)) for a, b in re.findall(r"Page\s+\d+ size:\s+([\d.]+) x ([\d.]+) pts", run("pdfinfo", "-f", "1", "-l", "100000", pdf))]
@@ -62,7 +57,6 @@ def pages(pdf):
 
 
 def links(pdf):
-    """Number of link annotations (web or page links)."""
     return len(re.findall(r"<a href=", run("pdftohtml", "-xml", "-i", "-zoom", "1", "-stdout", pdf)))
 
 

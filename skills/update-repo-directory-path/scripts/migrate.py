@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 """Usage: migrate.py OLD [--to NEW_PATH] [--claude-dir DIR] [--with-sessions] [--apply]
        migrate.py --list-orphans [--claude-dir DIR]
-Claude Code keeps a project's memory under DIR/projects/<key>/memory, where the key is the project path with every
-character that is not a letter or digit turned into a dash. After you rename or move a repo by hand, a session in the
-new place has a new key and finds no memory. This copies the memory of the old key into the new key.
-OLD is the old path (it need not exist any more) or just the old folder name. NEW_PATH defaults to the current directory.
---list-orphans shows projects whose recorded working directory no longer exists, for when the old path is forgotten.
-Without --apply it only prints the plan. It never deletes, never overwrites a file that differs (it reports a conflict),
-and merges MEMORY.md by adding the index lines that are missing. --with-sessions also copies the old conversation
-transcripts. DIR defaults to ~/.claude.
-Exit 0: done or nothing to do. Exit 1: an error. Exit 2: there were conflicts left for you to resolve."""
+Exit 0: done or nothing to do. Exit 1: an error. Exit 2: there were conflicts left for you to resolve.
+"""
 import filecmp, json, os, re, shutil, sys, time
 
 

@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
-"""Validate an asking-for-me run file.
-
-Usage: validate.py run.json [--solver solver.json]
-Exit 0 when valid, 1 on errors or solver disagreements. With --solver, compares
-the blind solver's answers ({"answers": {id: answer}}) with the key.
+"""Usage: validate.py run.json [--solver solver.json]
+Exit 0 when valid, 1 on errors or solver disagreements.
 """
 import json, re, sys
 

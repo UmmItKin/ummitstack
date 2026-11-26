@@ -1,6 +1,5 @@
 #!/bin/sh
 # Usage: check.sh ["commit message"]. Run after staging, before committing.
-# One line per finding: kind and location only, never the matched text.
 # Exit 0 clean, 1 blocks the commit, 2 needs one user confirmation.
 git rev-parse --git-dir >/dev/null 2>&1 || { echo "stop not-a-git-repository"; exit 1; }
 stop=0; ask=0
