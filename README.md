@@ -179,6 +179,13 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 
 </details>
 
+<details>
+<summary><b>update-repo-directory-path</b>: keep Claude Code memory after moving a repo</summary>
+
+`/update-repo-directory-path <new-path>` copies the project memory from the old path to the new one, because Claude Code stores memory per project path and a moved repo starts with none. It shows a preview first and only copies on a second step. It never deletes or overwrites: a file that differs is reported as a conflict, `MEMORY.md` only gains its missing lines, and the old folder is left as it was. `--with-sessions` also copies the old conversations. Claude Code only.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
