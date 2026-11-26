@@ -165,6 +165,13 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 
 </details>
 
+<details>
+<summary><b>verify-skill</b>: check a skill in one shot, including a cold-start run</summary>
+
+`/verify-skill <skill-dir> [sample-input]` runs static checks (frontmatter, scripts, forbidden glyphs, personal paths), the skill's own tests, then a cold-start run by a fresh Sonnet low-effort subagent that follows only the `SKILL.md`, and fixes the bugs and gaps it reports, up to 3 rounds. It asks nothing unless there is no sample input. It never commits or pushes.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)

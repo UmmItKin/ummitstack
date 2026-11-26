@@ -39,6 +39,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | A PDF rebuild is the same only when text, font, size, baseline, width, shapes and pages match | `pdf-reverse-pandoc/scripts/fidelity.py`; `tests/mutate.py` cases |
 | Scanned PDFs and unredrawn curves or pictures stop the run unless accepted | `reverse.py` exit 2; `verify.py` structure gate |
 | The run state machine keeps its invariants (complete only with proof, bounded rounds and budget) | `specs/pipeline.tla` via `scripts/tla-check.sh`, part of `scripts/check.sh` |
+| Every skill is checked cold by a fresh low-effort subagent before it is published (own tests miss gaps a reader hits) | `verify-skill` (`static_check.py`, `references/cold-start.md`); its own `tests/run.sh` |
 | Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.
