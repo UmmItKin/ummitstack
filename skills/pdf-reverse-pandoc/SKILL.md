@@ -23,8 +23,10 @@ This is a positional rebuild, not a reflow. Every run of text is placed at its o
 - Curves, pictures, links and form fields are not kept. `verify.py` fails on them unless the user accepts the loss with `--accept-unsupported`. Tell the user what will be lost before accepting.
 - Every subagent is `sonnet` at low effort, never another model or a higher effort. A subagent only looks; it never edits.
 - At most 3 fix rounds. Then report what is left.
+- If a gate fails and cannot be fixed, tell the user what is lost and let them decide. If they accept, record it as an accepted finding (see `references/phases.md`). If nobody can decide, end with `run.py stop <out> "<reason>"`, which writes `REPORT.md` as an incomplete run. Never pass `--accept-unsupported` or accept a finding on your own.
 
 ## Phases
+Record each with `run.py phase <out> <id> done` (ids: `setup`, `fonts`, `recon`, `extract`, `rebuild`, `verify-structure`, `verify-look`, `fix`, `report`; a skipped phase needs a note: `run.py phase <out> fix skipped "nothing to fix"`).
 0. **setup.** `setup.sh`, then `run.py init`. The profile sets the subagent budget (0, 2 or 6).
 1. **fonts.** `pdfinfo.py` lists the fonts and, for each, the stand-in that would be used when it is not installed.
 2. **recon.** `recon.py` checks the text layer and encryption and lists curves, pictures, links and form fields, which are not kept.

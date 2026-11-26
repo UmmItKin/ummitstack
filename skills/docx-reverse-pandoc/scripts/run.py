@@ -108,6 +108,7 @@ def main():
                                "agents_used": 0, "rounds": 0, "run_status": "in_progress", "incomplete_reason": None, "gates": {},
                                "phases": [{"id": p, "state": "pending", "note": ""} for p, _ in PHASES]})
         save(out, "findings.json", [])
+        print(f"run started in {out}")
         return
     run, findings = load(out, "run.json", None), load(out, "findings.json", [])
     if run is None:
@@ -149,7 +150,8 @@ def main():
     elif cmd == "stop" and len(a) >= 3:
         run["run_status"], run["incomplete_reason"] = "incomplete", " ".join(a[2:])
         save(out, "run.json", run)
-        print(f"run stopped as incomplete: {run['incomplete_reason']}")
+        write_report(out, run, findings)
+        print(f"run stopped as incomplete: {run['incomplete_reason']}; wrote {out}/REPORT.md")
     elif cmd == "agents" and len(a) == 3:
         run["agents_used"] = int(a[2])
         save(out, "run.json", run)

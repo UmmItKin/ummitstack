@@ -76,5 +76,6 @@ d = f"{temp}/run7"
 run("init", d, "--input", "x.pdf")
 run("stop", d, "a gate failed and nobody could decide")
 check("a stopped run is valid and says why", d, True)
+print(("PASS " if os.path.exists(f"{d}/REPORT.md") else "FAIL ") + "and a stopped run still gets a REPORT.md")
 edit(d, incomplete_reason=None)
 check("and a stopped run without a reason is an error", d, False)

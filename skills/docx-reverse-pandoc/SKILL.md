@@ -21,8 +21,10 @@ A rebuild that looks right in the XML can still be wrong on the page, and one th
 - Some features are not kept (text boxes, floating objects, comments, content controls other than the table of contents). `coverage.py` lists them as `unhandled`. Stop and ask, or suggest python-docx instead.
 - Every subagent is `sonnet` at low effort, never another model or a higher effort. A subagent only looks; it never edits.
 - At most 3 fix rounds. Then report what is left.
+- If a gate fails and cannot be fixed, tell the user what is lost and let them decide. If they accept, record it as an accepted finding (see `references/phases.md`). If nobody can decide, end with `run.py stop <out> "<reason>"`, which writes `REPORT.md` as an incomplete run. Never pass `--accept-unsupported` or accept a finding on your own.
 
 ## Phases
+Record each with `run.py phase <out> <id> done` (ids: `setup`, `fonts`, `coverage`, `reverse`, `rebuild`, `verify-structure`, `verify-look`, `fix`, `report`; a skipped phase needs a note: `run.py phase <out> fix skipped "nothing to fix"`).
 0. **setup.** `run.py init`. The profile sets the subagent budget (0, 2 or 6).
 1. **fonts.** `inventory.py` lists the fonts the text needs and which are missing. A gate: when any are missing, ask the user with the AskUserQuestion menu (see Fonts) before going on.
 2. **coverage.** `coverage.py` lists every property the document uses and whether anything keeps it. An `unhandled` unit stops the run unless accepted with a reason.
