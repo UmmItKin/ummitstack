@@ -180,9 +180,9 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 </details>
 
 <details>
-<summary><b>update-repo-directory-path</b>: keep Claude Code memory after moving a repo</summary>
+<summary><b>update-repo-directory-path</b>: keep Claude Code memory after renaming a repo folder</summary>
 
-`/update-repo-directory-path <new-path>` copies the project memory from the old path to the new one, because Claude Code stores memory per project path and a moved repo starts with none. It shows a preview first and only copies on a second step. It never deletes or overwrites: a file that differs is reported as a conflict, `MEMORY.md` only gains its missing lines, and the old folder is left as it was. `--with-sessions` also copies the old conversations. Claude Code only.
+After you rename or move a repo folder by hand and start a new session there, the agent has no memory, because Claude Code stores memory per project path. Run `/update-repo-directory-path <old-path-or-name>` inside the moved repo to copy the old memory into it. With no argument it lists projects whose recorded folder no longer exists, so you can pick the old one. It shows a preview first and only copies on a second step. It never deletes or overwrites: a file that differs is reported as a conflict, `MEMORY.md` only gains its missing lines, and the old folder is left as it was. `--with-sessions` also copies the old conversations. Claude Code only.
 
 </details>
 
