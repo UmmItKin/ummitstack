@@ -33,6 +33,8 @@ expect "build runs" 0 sh "$T/out/build.sh"
 expect "verify passes structure and fidelity" 0 python3 "$s/verify.py" "$T/f.docx" "$T/out" --no-render
 expect "rebuilt XML parses and no cell has two tcPr" 0 python3 "$here/check_xml.py" "$T/out/rebuilt.docx"
 
+expect "the --missing-fonts flag works after the file name too (found by a cold-start test)" 0 python3 "$s/inventory.py" "$T/f.docx" --missing-fonts
+
 echo "== mistake: skipping the post-processing (page break, background, rows, shading were lost) =="
 ( cd "$T/out" && pandoc doc.md -f markdown -o noprocess.docx --reference-doc=reference.docx --lua-filter=build.lua )
 expect "the structure compare fails without postprocess.py" nonzero python3 "$s/inventory.py" "$T/f.docx" "$T/out/noprocess.docx"

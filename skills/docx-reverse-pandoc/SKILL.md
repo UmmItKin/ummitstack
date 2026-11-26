@@ -26,7 +26,7 @@ A rebuild that looks right in the XML can still be wrong on the page, and one th
 ## Phases
 Record each with `run.py phase <out> <id> done` (ids: `setup`, `fonts`, `coverage`, `reverse`, `rebuild`, `verify-structure`, `verify-look`, `fix`, `report`; a skipped phase needs a note: `run.py phase <out> fix skipped "nothing to fix"`).
 0. **setup.** `run.py init`. The profile sets the subagent budget (0, 2 or 6).
-1. **fonts.** `inventory.py` lists the fonts the text needs and which are missing. A gate: when any are missing, ask the user with the AskUserQuestion menu (see Fonts) before going on.
+1. **fonts.** `inventory.py` lists the fonts and which are missing. A gate: when a font the text uses is missing, ask the user with the AskUserQuestion menu (see Fonts) before going on. A font named only in styles and not used by the text is reported but does not stop the run.
 2. **coverage.** `coverage.py` lists every property the document uses and whether anything keeps it. An `unhandled` unit stops the run unless accepted with a reason.
 3. **reverse.** `reverse.sh` writes `doc.md`, `reference.docx`, `build.sh` and the table files. It refuses a missing text font unless `--allow-missing-fonts` is given.
 4. **rebuild.** `build.sh` runs Pandoc and `postprocess.py`.

@@ -3,7 +3,7 @@
 
 Usage: inventory.py A.docx              print a summary of A
        inventory.py --widths A.docx     print the column widths of each table, one line per table
-       inventory.py --missing-fonts A.docx   print the fonts the text needs that are not installed; exit 1 if any
+       inventory.py --missing-fonts A.docx   (the flag may come before or after the file) print the fonts the text needs that are not installed; exit 1 if any
        inventory.py A.docx B.docx       compare B (the rebuild) with A (the original)
        --tol 0.05                       relative tolerance for table column widths
 The zip is read in memory and nothing is extracted. Exit 1 when a compare finds a difference.
@@ -269,8 +269,8 @@ def compare(a, b, tol):
 
 def main():
     args, tol = sys.argv[1:], 0.05
-    if len(args) == 2 and args[0] == "--missing-fonts":
-        fonts = summarise(args[1])["fonts"]
+    if "--missing-fonts" in args and len(args) == 2:
+        fonts = summarise([a for a in args if a != "--missing-fonts"][0])["fonts"]
         missing = sorted(n for n, w in fonts.items() if ("document" in w or "headers and footers" in w) and font_available(n) is False)
         print("\n".join(missing))
         sys.exit(1 if missing else 0)

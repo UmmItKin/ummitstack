@@ -31,7 +31,11 @@ def main():
 
     fonts = inventory.summarise(orig)["fonts"]
     missing = sorted(n for n, w in fonts.items() if ("document" in w or "headers and footers" in w) and inventory.font_available(n) is False)
-    gates["fonts"] = {"result": "missing" if missing else "ok", "detail": ("missing for the text: " + ", ".join(missing)) if missing else f"{len(fonts)} fonts named, all installed"}
+    styles_only = sorted(n for n, w in fonts.items() if n not in missing and inventory.font_available(n) is False)
+    detail = ("missing for the text: " + ", ".join(missing)) if missing else f"{len(fonts)} fonts named, none missing for the text"
+    if styles_only:
+        detail += ("; " if missing else ", but ") + "named only in styles and not installed: " + ", ".join(styles_only) + " (the text does not use them, so nothing stops)"
+    gates["fonts"] = {"result": "missing" if missing else "ok", "detail": detail}
 
     code, text = run(sys.executable, os.path.join(HERE, "inventory.py"), orig, rebuilt)
     fails = [l for l in text.splitlines() if l.startswith("FAIL")]

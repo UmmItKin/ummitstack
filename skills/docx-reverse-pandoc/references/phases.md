@@ -16,7 +16,7 @@ The scripts do the mechanical work. A subagent only looks, never edits.
 | 7 | fix | edit `doc.md` or the scripts, then repeat phases 4 to 6 | `findings.json` | after 3 rounds, report what is left |
 | 8 | report | `run.py gates <out>`, then `run.py report <out>` | `REPORT.md` | `report` lists what stops it from closing |
 
-Record each phase with `run.py phase <out> <phase> done`. A phase that does not apply is `skipped` with a note, and a
+Record each phase with `run.py phase <out> <phase> done`. `run.py agents <out> N` is only for runs that used subagents; leave it out otherwise. A phase that does not apply is `skipped` with a note, and a
 phase that stopped the run is `blocked` or `failed` with a note.
 
 Phase ids for `run.py phase`: `setup`, `fonts`, `coverage`, `reverse`, `rebuild`, `verify-structure`, `verify-look`, `fix`, `report`. Mark `fix` as `skipped` with a note when nothing needed fixing.
