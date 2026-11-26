@@ -2,9 +2,12 @@
 """Usage:
   run.py init OUT-DIR --input FILE [--profile quick|standard|deep] [--budget N]
   run.py phase OUT-DIR PHASE pending|done|skipped|blocked|failed [note]
-  run.py gates OUT-DIR            read gates.json (written by verify.py) into the run
+  run.py gates OUT-DIR            read gates.json (written by verify.py) into the run and print each gate
+  (phase done is refused until the phase artifact exists; report validates, writes REPORT.md, marks the report phase
+  done and sets the run complete, so it is the only command that completes a run)
   run.py finding OUT-DIR add PHASE high|med|low AREA EVIDENCE
   run.py finding OUT-DIR resolve ID fixed|accepted [reason]
+  run.py stop OUT-DIR REASON      end the run as incomplete (use when a gate fails and nobody can decide)
   run.py agents OUT-DIR N         record that N subagents were used
   run.py validate OUT-DIR         check the run for consistency (exit 1 on any error)
   run.py report OUT-DIR           write REPORT.md from a valid run
@@ -32,7 +35,13 @@ def save(out, name, data):
         f.write("\n")
 
 
-def validate(out):
+def failing_gates(run, findings):
+    """Gates whose result is fail and that no accepted finding (area = gate name, with a reason) covers."""
+    covered = {f["area"] for f in findings if f.get("state") == "accepted" and f.get("reason")}
+    return [g for g, v in run.get("gates", {}).items() if v.get("result") == "fail" and g not in covered]
+
+
+def validate(out, skip_artifacts=()):
     run, findings, errs = load(out, "run.json", None), load(out, "findings.json", []), []
     if run is None:
         return ["run.json is missing"]
@@ -50,7 +59,7 @@ def validate(out):
         if p["state"] in ("skipped", "blocked", "failed") and not p.get("note"):
             errs.append(f"phase {pid}: {p['state']} needs a note")
         if p["state"] == "done":
-            for a in artifacts:
+            for a in ([] if pid in skip_artifacts else artifacts):
                 if not os.path.exists(os.path.join(out, a)):
                     errs.append(f"phase {pid}: done but {a} does not exist")
             if seen_open:
@@ -78,6 +87,7 @@ def validate(out):
         for f in findings:
             if f.get("state") == "open" and f.get("severity") in ("high", "med"):
                 errs.append(f"complete run but finding {f['id']} ({f['severity']}) is open")
+        errs += [f"complete run but gate {g} failed and no accepted finding covers it" for g in failing_gates(run, findings)]
     elif run.get("run_status") == "incomplete" and not run.get("incomplete_reason"):
         errs.append("incomplete needs incomplete_reason")
     return errs
@@ -105,6 +115,15 @@ def main():
     if cmd == "phase" or (cmd == "finding" and len(a) >= 3 and a[2] == "add"):
         run["run_status"] = "in_progress" if run.get("run_status") == "complete" else run.get("run_status")
     if cmd == "phase" and len(a) >= 4:
+        spec = dict(PHASES)
+        if a[2] not in spec or a[3] not in STATES:
+            sys.exit(f"error: phase must be one of {[p for p, _ in PHASES]} and state one of {sorted(STATES)}")
+        missing = [x for x in spec[a[2]] if not os.path.exists(os.path.join(out, x))] if a[3] == "done" and a[2] != "report" else []
+        if missing:
+            sys.exit(f"error: phase {a[2]} cannot be done yet, missing {', '.join(missing)}")
+        if a[3] in ("skipped", "blocked", "failed") and not " ".join(a[4:]):
+            sys.exit(f"error: {a[3]} needs a note")
+        print(f"phase {a[2]}: {a[3]}")
         for p in run["phases"]:
             if p["id"] == a[2]:
                 p["state"], p["note"] = a[3], " ".join(a[4:])
@@ -112,8 +131,12 @@ def main():
                     run["rounds"] += 1
         save(out, "run.json", run)
     elif cmd == "gates":
+        if not os.path.exists(os.path.join(out, "gates.json")):
+            sys.exit("error: gates.json is missing; run verify.py first")
         run["gates"] = load(out, "gates.json", {})
         save(out, "run.json", run)
+        for g in GATES:
+            print(f"{g}: {run['gates'].get(g, {}).get('result', 'not recorded')}")
     elif cmd == "finding" and len(a) >= 3 and a[2] == "add" and len(a) >= 7:
         findings.append({"id": f"F{len(findings) + 1}", "phase": a[3], "severity": a[4], "area": a[5], "evidence": " ".join(a[6:]), "state": "open", "reason": ""})
         save(out, "findings.json", findings)
@@ -123,17 +146,36 @@ def main():
             if f["id"] == a[3]:
                 f["state"], f["reason"] = a[4], " ".join(a[5:])
         save(out, "findings.json", findings)
+    elif cmd == "stop" and len(a) >= 3:
+        run["run_status"], run["incomplete_reason"] = "incomplete", " ".join(a[2:])
+        save(out, "run.json", run)
+        print(f"run stopped as incomplete: {run['incomplete_reason']}")
     elif cmd == "agents" and len(a) == 3:
         run["agents_used"] = int(a[2])
         save(out, "run.json", run)
-    elif cmd in ("validate", "report"):
+    elif cmd == "validate":
         errs = validate(out)
         for e in errs:
             print("error:", e)
         print(f"errors: {len(errs)}")
-        if cmd == "report" and not errs:
-            write_report(out, run, findings)
         sys.exit(1 if errs else 0)
+    elif cmd == "report":
+        errs = validate(out, skip_artifacts=("report",))
+        errs += [f"cannot close: phase {p['id']} is {p['state']}" for p in run["phases"] if p["id"] != "report" and p["state"] not in ("done", "skipped")]
+        errs += [f"cannot close: gate {g} is not recorded (run: run.py gates)" for g in GATES if g not in run.get("gates", {})]
+        errs += [f"cannot close: gate {g} failed; fix it, or accept it with: run.py finding {out} add <phase> med {g} <evidence> then resolve it as accepted with a reason" for g in failing_gates(run, findings)]
+        errs += [f"cannot close: finding {f['id']} ({f['severity']}) is open" for f in findings if f["state"] == "open" and f["severity"] in ("high", "med")]
+        for e in errs:
+            print("error:", e)
+        if errs:
+            sys.exit(1)
+        for p in run["phases"]:
+            if p["id"] == "report":
+                p["state"] = "done"
+        run["run_status"] = "complete"
+        save(out, "run.json", run)
+        write_report(out, run, findings)
+        print(f"complete: wrote {out}/REPORT.md")
     else:
         sys.exit(__doc__)
 

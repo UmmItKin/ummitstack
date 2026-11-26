@@ -31,7 +31,7 @@ A rebuild that looks right in the XML can still be wrong on the page, and one th
 5. **verify-structure.** `verify.py --no-render`: structure and fidelity gates.
 6. **verify-look.** `verify.py`: renders both files and scores every page. In `standard` and `deep`, a fresh subagent looks at `compare.png` and lists the visible differences.
 7. **fix.** Each difference is a finding. Fix it where `references/phases.md` says, add the check that would have caught it to `tests/run.sh`, and repeat phases 4 to 6.
-8. **report.** `run.py gates`, `run.py validate`, `run.py report`. `REPORT.md` is written from validated data only.
+8. **report.** `run.py gates <out>`, then `run.py report <out>`. `report` refuses while a phase, gate or high or medium finding is open, writes `REPORT.md` from validated data and is the only command that completes a run.
 
 ## Editing doc.md
 - Keep `::: {custom-style="Name"}` blocks and `[text]{custom-style="Name"}` spans. The attribute maps to a Word style; a class like `{.Name}` does not.

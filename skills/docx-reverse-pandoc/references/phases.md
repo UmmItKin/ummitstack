@@ -14,10 +14,18 @@ The scripts do the mechanical work. A subagent only looks, never edits.
 | 5 | verify-structure | `python3 <skill-dir>/scripts/verify.py <file> <out> --no-render` | `gates.json` | structure or fidelity fails after the fix rounds |
 | 6 | verify-look | `python3 <skill-dir>/scripts/verify.py <file> <out>` | `gates.json`, a `verify-N` folder with `compare.png` | the page counts differ |
 | 7 | fix | edit `doc.md` or the scripts, then repeat phases 4 to 6 | `findings.json` | after 3 rounds, report what is left |
-| 8 | report | `run.py gates <out>`, `run.py validate <out>`, `run.py report <out>` | `REPORT.md` | `validate` reports an error |
+| 8 | report | `run.py gates <out>`, then `run.py report <out>` | `REPORT.md` | `report` lists what stops it from closing |
 
 Record each phase with `run.py phase <out> <phase> done`. A phase that does not apply is `skipped` with a note, and a
 phase that stopped the run is `blocked` or `failed` with a note.
+
+Phase ids for `run.py phase`: `setup`, `fonts`, `coverage`, `reverse`, `rebuild`, `verify-structure`, `verify-look`, `fix`, `report`. Mark `fix` as `skipped` with a note when nothing needed fixing.
+
+## When a gate fails
+`report` will not close a run with a failed gate. Fix it and rerun `verify.py`. If it cannot be fixed (for example the PDF has a link that is not kept), tell the user what is lost and let them decide. If they accept, add a finding whose area is the gate name (`run.py finding <out> add <phase> med structure "<what is lost>"`) and resolve it as `accepted` with their reason; then `report` closes. If nobody can decide, end the run with `run.py stop <out> "<reason>"`; an incomplete run is a valid end state and is reported as such.
+
+## Closing a run
+In this order: `verify.py` writes `gates.json`; `run.py gates <out>` reads it into the run; mark each finished phase with `run.py phase <out> <phase> done` (refused until its artifact exists); then `run.py report <out>` checks everything, writes `REPORT.md`, marks the report phase done and completes the run. `run.py validate <out>` can be run at any time.
 
 ## The gates
 

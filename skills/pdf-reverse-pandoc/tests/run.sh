@@ -50,6 +50,8 @@ typst compile "$T/plain.typ" "$T/plain.pdf" >/dev/null 2>&1
 expect "fidelity fails on a text-only rebuild" nonzero python3 "$s/fidelity.py" "$T/f.pdf" "$T/plain.pdf"
 
 echo "== mistake: starting before checking the input =="
+expect "recon writes recon.json for a text PDF" 0 python3 "$s/recon.py" "$T/f.pdf" "$T/recon-ok"
+expect "recon stops on a PDF with no text layer" 2 python3 "$s/recon.py" "$T/scan.pdf" "$T/recon-scan"
 expect "reverse refuses a PDF with no text layer" 2 python3 "$s/reverse.py" "$T/scan.pdf" "$T/scan-out"
 mkdir "$T/bin" && printf '#!/bin/sh\necho "Fake Stand In"\n' > "$T/bin/fc-match" && chmod +x "$T/bin/fc-match"
 expect "reverse refuses a font that is not installed" 3 env PATH="$T/bin:$PATH" python3 "$s/reverse.py" "$T/f.pdf" "$T/font-out"
@@ -67,8 +69,8 @@ expect "verify fails when the original has a link" nonzero python3 "$s/verify.py
 expect "and passes when the loss is accepted" 0 python3 "$s/verify.py" "$T/link.pdf" "$T/link-out" --no-render --accept-unsupported
 
 echo "== mistake: calling a run complete without proof =="
-python3 "$here/check_run.py" "$s" "$T" > "$T/run-results.txt"
-python3 "$here/check_random.py" "$s" "$T" >> "$T/run-results.txt"
+python3 "$here/check_run.py" "$s" "$T" > "$T/run-results.txt" 2>"$T/run-errors.txt" || bad "check_run.py crashed: $(tail -1 "$T/run-errors.txt")"
+python3 "$here/check_random.py" "$s" "$T" >> "$T/run-results.txt" 2>>"$T/run-errors.txt" || bad "check_random.py crashed: $(tail -1 "$T/run-errors.txt")"
 cat "$T/run-results.txt"
 pass=$((pass + $(grep -c '^PASS' "$T/run-results.txt")))
 fail=$((fail + $(grep -c '^FAIL' "$T/run-results.txt")))

@@ -24,8 +24,7 @@ def edit(folder, **changes):
 
 d = f"{temp}/run1"
 run("init", d, "--input", "x.pdf")
-run("phase", d, "extract", "done")
-check("a phase marked done without its artifact is an error", d, False)
+print(("PASS " if run("phase", d, "extract", "done").returncode != 0 else "FAIL ") + "a phase cannot be marked done without its artifact")
 d = f"{temp}/run2"
 run("init", d, "--input", "x.pdf")
 edit(d, run_status="complete")
@@ -34,17 +33,48 @@ d = f"{temp}/run3"
 run("init", d, "--input", "x.pdf")
 run("agents", d, "3")
 check("more subagents than the budget is an error", d, False)
-d = f"{temp}/run4"
+d = f"{temp}/run5"
 run("init", d, "--input", "x.pdf")
 for p in PHASES:
-    for a in p["artifacts"]:
-        if a != "run.json":
-            open(f"{d}/{a}", "w").write("x")
+    for name in p["artifacts"]:
+        if name not in ("run.json", "REPORT.md", "gates.json"):
+            open(f"{d}/{name}", "w").write("x")
+json.dump({g: {"result": "pass"} for g in ("fonts", "structure", "fidelity", "look")}, open(f"{d}/gates.json", "w"))
+print(("PASS " if run("report", d).returncode != 0 else "FAIL ") + "report refuses to close a run whose phases are not done and gates are not recorded")
 for p in PHASES:
-    run("phase", d, p["id"], "skipped" if p["id"] == "fix" else "done", "no findings" if p["id"] == "fix" else "")
-edit(d, run_status="complete", gates={g: {"result": "pass"} for g in ("fonts", "structure", "fidelity", "look")})
-check("a complete run with every phase, artifact and gate is valid", d, True)
+    if p["id"] not in ("report", "fix"):
+        run("phase", d, p["id"], "done")
+run("phase", d, "fix", "skipped", "no findings")
+print(("PASS " if run("report", d).returncode != 0 else "FAIL ") + "report refuses until the gates are read into the run")
+run("gates", d)
+r = run("report", d)
+print(("PASS " if r.returncode == 0 and json.load(open(f"{d}/run.json"))["run_status"] == "complete" and os.path.exists(f"{d}/REPORT.md") else "FAIL ") + "report closes a proper run, writes REPORT.md and marks it complete")
+check("and the closed run validates", d, True)
 run("finding", d, "add", "verify-look", "high", "tables", "x")
 print(("PASS " if json.load(open(f"{d}/run.json"))["run_status"] == "in_progress" else "FAIL ") + "and a new finding reopens the complete run (found by the TLA+ model)")
 edit(d, run_status="complete")
 check("and forcing complete with a high finding open is an error", d, False)
+
+d = f"{temp}/run6"
+run("init", d, "--input", "x.pdf")
+for p in PHASES:
+    for name in p["artifacts"]:
+        if name not in ("run.json", "REPORT.md", "gates.json"):
+            open(f"{d}/{name}", "w").write("x")
+json.dump({"fonts": {"result": "ok"}, "structure": {"result": "fail"}, "fidelity": {"result": "pass"}, "look": {"result": "pass"}}, open(f"{d}/gates.json", "w"))
+for p in PHASES:
+    if p["id"] not in ("report", "fix"):
+        run("phase", d, p["id"], "done")
+run("phase", d, "fix", "skipped", "nothing to fix")
+run("gates", d)
+print(("PASS " if run("report", d).returncode != 0 else "FAIL ") + "report refuses to close a run with a failed gate (found by a cold-start test)")
+run("finding", d, "add", "verify-structure", "med", "structure", "one link is not kept")
+run("finding", d, "resolve", "F1", "accepted", "the user accepted losing the link")
+r = run("report", d)
+print(("PASS " if r.returncode == 0 else "FAIL ") + "and closes once an accepted finding with a reason covers that gate")
+d = f"{temp}/run7"
+run("init", d, "--input", "x.pdf")
+run("stop", d, "a gate failed and nobody could decide")
+check("a stopped run is valid and says why", d, True)
+edit(d, incomplete_reason=None)
+check("and a stopped run without a reason is an error", d, False)

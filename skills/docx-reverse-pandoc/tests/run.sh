@@ -58,7 +58,7 @@ expect "reverse refuses a missing text font" 3 sh "$s/reverse.sh" "$T/font.docx"
 expect "reverse goes on with --allow-missing-fonts" 0 sh "$s/reverse.sh" "$T/font.docx" "$T/font-out2" --allow-missing-fonts
 
 echo "== mistake: calling a run complete without proof =="
-python3 "$here/check_run.py" "$s" "$T" > "$T/run-results.txt"
+python3 "$here/check_run.py" "$s" "$T" > "$T/run-results.txt" 2>"$T/run-errors.txt" || bad "check_run.py crashed: $(tail -1 "$T/run-errors.txt")"
 cat "$T/run-results.txt"
 pass=$((pass + $(grep -c '^PASS' "$T/run-results.txt")))
 fail=$((fail + $(grep -c '^FAIL' "$T/run-results.txt")))

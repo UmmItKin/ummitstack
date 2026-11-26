@@ -28,6 +28,7 @@ Fix == /\ status = "in_progress" /\ rounds < MaxRounds
        /\ rounds' = rounds + 1 /\ UNCHANGED <<state, agents, gates, open, status>>
 
 UseAgent == /\ agents < Budget /\ agents' = agents + 1 /\ UNCHANGED <<state, rounds, gates, open, status>>
+(* Record(g): in run.py a failed gate is recorded too but blocks Complete unless an accepted finding covers it; here only passing or accepted gates enter the set. *)
 Record(g) == /\ gates' = gates \cup {g} /\ UNCHANGED <<state, rounds, agents, open, status>>
 Open == /\ open < 2 /\ open' = open + 1 /\ status' = "in_progress" /\ UNCHANGED <<state, rounds, agents, gates>>
 Resolve == /\ open > 0 /\ open' = open - 1 /\ UNCHANGED <<state, rounds, agents, gates, status>>

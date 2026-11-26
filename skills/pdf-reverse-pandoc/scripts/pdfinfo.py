@@ -71,7 +71,7 @@ def facts(pdf):
     get = lambda k: (re.search(rf"^{k}:\s*(.*)$", info, re.M) or [None, ""])[1].strip()
     pg = pages(pdf)
     return {"pages": len(pg), "tagged": get("Tagged") == "yes", "encrypted": get("Encrypted").startswith("yes"), "form": get("Form") not in ("", "none"), "links": links(pdf),
-            "runs_per_page": [len(p["runs"]) for p in pg], "fonts": fonts(pdf), "images": max(0, len(run("pdfimages", "-list", pdf).splitlines()) - 2)}
+            "runs_per_page": [len(p["runs"]) for p in pg], "fonts": [dict(f, stand_in=installed(f["family"]) or "") for f in fonts(pdf)], "images": max(0, len(run("pdfimages", "-list", pdf).splitlines()) - 2)}
 
 
 if __name__ == "__main__":
