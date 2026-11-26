@@ -9,7 +9,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 - Commit only when the user says so, and run `check-commit-info` first (stage with explicit paths).
 - Prose and slides: no em dashes, no arrow glyphs, no emoji. Do not credit other skills as references.
 - Subagents in these skills are `sonnet` at low effort only.
-- `docx-reverse-pandoc` is a phased pipeline (setup, fonts, coverage, reverse, rebuild, verify, fix, report); read `skills/docx-reverse-pandoc/references/phases.md` before changing it.
+- `docx-reverse-pandoc` and `pdf-reverse-pandoc` are phased pipelines (setup, fonts, coverage, reverse, rebuild, verify, fix, report); read `skills/docx-reverse-pandoc/references/phases.md` before changing it.
 
 ## Mistakes that were corrected (docx-reverse-pandoc)
 
@@ -35,5 +35,9 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | Never delete in the user's folders; redo in a new out-dir | `reverse.sh` refuses a used out-dir; SKILL.md rule |
 | No personal data in this public repo; never commit unless asked | `check-commit-info`; SKILL.md rule |
 | No em dashes, arrow glyphs or emoji in prose | `unslop-writing` scan |
+| `run.py` and `pagescore.py` are the same in the docx and pdf skills (skills install one by one, so each carries a copy) | `scripts/check.sh` compares them |
+| A PDF rebuild is the same only when text, font, size, baseline, width, shapes and pages match | `pdf-reverse-pandoc/scripts/fidelity.py`; `tests/mutate.py` cases |
+| Scanned PDFs and unredrawn curves or pictures stop the run unless accepted | `reverse.py` exit 2; `verify.py` structure gate |
+| Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.

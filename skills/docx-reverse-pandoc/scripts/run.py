@@ -8,16 +8,14 @@
   run.py agents OUT-DIR N         record that N subagents were used
   run.py validate OUT-DIR         check the run for consistency (exit 1 on any error)
   run.py report OUT-DIR           write REPORT.md from a valid run
-Only this script writes run.json and findings.json. Phases, artifacts, gates and findings follow the same
+The phase list and the artifact each phase must leave are in phases.json beside this file; this file is the same in
+every skill that has one. Only this script writes run.json and findings.json. Phases, artifacts, gates and findings follow the same
 discipline as a coverage-led audit: a phase is done only when its artifact exists, and a run is complete only
 when every gate is recorded and no high or medium finding is open."""
 import json, os, sys
 
-PHASES = [
-    ("setup", ["run.json"]), ("fonts", ["inventory-original.txt"]), ("coverage", ["coverage.json"]),
-    ("reverse", ["doc.md", "reference.docx", "build.sh"]), ("rebuild", ["rebuilt.docx"]),
-    ("verify-structure", ["gates.json"]), ("verify-look", ["gates.json"]), ("fix", []), ("report", ["REPORT.md"]),
-]
+HERE = os.path.dirname(os.path.abspath(__file__))
+PHASES = [(p["id"], p["artifacts"]) for p in json.load(open(os.path.join(HERE, "phases.json"), encoding="utf-8"))]
 STATES = {"pending", "done", "skipped", "blocked", "failed"}
 BUDGET = {"quick": 0, "standard": 2, "deep": 6}
 GATES = ("fonts", "structure", "fidelity", "look")

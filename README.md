@@ -158,6 +158,13 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 
 </details>
 
+<details>
+<summary><b>pdf-reverse-pandoc</b>: edit the text of a PDF and rebuild it with Typst</summary>
+
+`/pdf-reverse-pandoc <file.pdf> [out-dir]` reverses a text PDF into `doc.typ`, which puts every run of text back at its place with the same font, size and letter spacing and redraws the table lines, then rebuilds a matching PDF. It is a positional rebuild, not a reflow. `scripts/setup.sh` lists the tools you need (poppler, typst, ImageMagick) and prints the install command for your system without running it. It runs in nine phases with gates for fonts, structure, per-run fidelity (text, font, size, baseline, width, lines, page count) and the rendered look, and `sh skills/pdf-reverse-pandoc/tests/run.sh` reproduces past mistakes. Scanned PDFs, curves and pictures are not supported.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)

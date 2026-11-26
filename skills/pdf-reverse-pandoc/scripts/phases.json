@@ -1,0 +1,56 @@
+[
+ {
+  "id": "setup",
+  "artifacts": [
+   "run.json"
+  ]
+ },
+ {
+  "id": "fonts",
+  "artifacts": [
+   "inventory-original.txt"
+  ]
+ },
+ {
+  "id": "recon",
+  "artifacts": [
+   "recon.json"
+  ]
+ },
+ {
+  "id": "extract",
+  "artifacts": [
+   "layout.json",
+   "doc.md"
+  ]
+ },
+ {
+  "id": "rebuild",
+  "artifacts": [
+   "doc.typ",
+   "rebuilt.pdf"
+  ]
+ },
+ {
+  "id": "verify-structure",
+  "artifacts": [
+   "gates.json"
+  ]
+ },
+ {
+  "id": "verify-look",
+  "artifacts": [
+   "gates.json"
+  ]
+ },
+ {
+  "id": "fix",
+  "artifacts": []
+ },
+ {
+  "id": "report",
+  "artifacts": [
+   "REPORT.md"
+  ]
+ }
+]
