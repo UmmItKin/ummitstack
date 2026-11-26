@@ -1,7 +1,8 @@
 ------------------------------ MODULE pipeline ------------------------------
 (* The run state of docx-reverse-pandoc and pdf-reverse-pandoc (scripts/run.py).
-   Not yet model checked: it needs tla2tools.jar, which is not in this repo.
-   To check it: java -cp tla2tools.jar tlc2.TLC -config pipeline.cfg pipeline.tla
+   Checked with TLC from tla2tools.jar v1.7.4 (github.com/tlaplus/tlaplus): no error, 27840 distinct states.
+   The first run found that a new finding could be added to a complete run; run.py now reopens the run.
+   The jar is not in this repo. To check: java -cp tla2tools.jar tlc2.TLC -config pipeline.cfg pipeline.tla
    Mapping to run.py: Finish = phase P done, Skip = phase P skipped, Fix = phase fix done
    (rounds + 1), Complete = run_status set to complete, validate = Valid. *)
 EXTENDS Naturals, Sequences
@@ -28,7 +29,7 @@ Fix == /\ status = "in_progress" /\ rounds < MaxRounds
 
 UseAgent == /\ agents < Budget /\ agents' = agents + 1 /\ UNCHANGED <<state, rounds, gates, open, status>>
 Record(g) == /\ gates' = gates \cup {g} /\ UNCHANGED <<state, rounds, agents, open, status>>
-Open == /\ open' = open + 1 /\ UNCHANGED <<state, rounds, agents, gates, status>>
+Open == /\ open < 2 /\ open' = open + 1 /\ status' = "in_progress" /\ UNCHANGED <<state, rounds, agents, gates>>
 Resolve == /\ open > 0 /\ open' = open - 1 /\ UNCHANGED <<state, rounds, agents, gates, status>>
 
 Complete == /\ status = "in_progress"

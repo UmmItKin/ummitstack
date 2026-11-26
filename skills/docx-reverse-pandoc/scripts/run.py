@@ -102,6 +102,8 @@ def main():
     run, findings = load(out, "run.json", None), load(out, "findings.json", [])
     if run is None:
         sys.exit("error: run.json is missing; run init first")
+    if cmd == "phase" or (cmd == "finding" and len(a) >= 3 and a[2] == "add"):
+        run["run_status"] = "in_progress" if run.get("run_status") == "complete" else run.get("run_status")
     if cmd == "phase" and len(a) >= 4:
         for p in run["phases"]:
             if p["id"] == a[2]:
@@ -115,6 +117,7 @@ def main():
     elif cmd == "finding" and len(a) >= 3 and a[2] == "add" and len(a) >= 7:
         findings.append({"id": f"F{len(findings) + 1}", "phase": a[3], "severity": a[4], "area": a[5], "evidence": " ".join(a[6:]), "state": "open", "reason": ""})
         save(out, "findings.json", findings)
+        save(out, "run.json", run)
     elif cmd == "finding" and len(a) >= 5 and a[2] == "resolve":
         for f in findings:
             if f["id"] == a[3]:
