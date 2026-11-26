@@ -6,7 +6,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 
 - Run all skill tests: `sh scripts/check.sh` (also the command for CI). One skill: `sh skills/<name>/tests/run.sh`.
 - The repo is public: use only fictional example content, never personal, school or project details.
-- Commit only when the user says so (or `commit-regular` is on), and run `check-commit-info` and `leak_scan.py` first (stage with explicit paths). Commits for the PDF skill mention issue #1 in the subject, as `(#1)`; never write `closes`.
+- Commit only when the user says so (or `commit-regular` is on), and run `check-commit-info` and `leak_scan.py` first (stage with explicit paths).
 - Prose and slides: no em dashes, no arrow glyphs, no emoji. Do not credit other skills as references.
 - Subagents in these skills are `sonnet` at low effort only.
 - `docx-reverse-pandoc` and `pdf-reverse-pandoc` are phased pipelines (setup, fonts, coverage, reverse, rebuild, verify, fix, report); read `skills/docx-reverse-pandoc/references/phases.md` before changing it.
