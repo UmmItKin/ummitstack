@@ -29,6 +29,7 @@ expect() {
 python3 "$here/make_fixture.py" "$T/f.pdf"
 python3 "$here/make_fixture.py" "$T/scan.pdf" --scan
 python3 "$here/make_fixture.py" "$T/curve.pdf" --curve
+python3 "$here/make_fixture.py" "$T/link.pdf" --link
 
 echo "== the good path =="
 expect "reverse accepts a text PDF whose fonts are installed" 0 python3 "$s/reverse.py" "$T/f.pdf" "$T/out"
@@ -59,6 +60,11 @@ echo "== mistake: ignoring what is not redrawn (curves, pictures) =="
 expect "reverse notes the curve and verify fails" nonzero python3 "$s/verify.py" "$T/curve.pdf" "$T/out" --no-render
 python3 "$s/reverse.py" "$T/curve.pdf" "$T/curve-out" >/dev/null 2>&1
 expect "and verify passes the structure gate when it is accepted" 0 python3 "$s/verify.py" "$T/curve.pdf" "$T/curve-out" --no-render --accept-unsupported
+
+echo "== mistake: losing links without saying so =="
+python3 "$s/reverse.py" "$T/link.pdf" "$T/link-out" >/dev/null 2>&1
+expect "verify fails when the original has a link" nonzero python3 "$s/verify.py" "$T/link.pdf" "$T/link-out" --no-render
+expect "and passes when the loss is accepted" 0 python3 "$s/verify.py" "$T/link.pdf" "$T/link-out" --no-render --accept-unsupported
 
 echo "== mistake: calling a run complete without proof =="
 python3 "$here/check_run.py" "$s" "$T" > "$T/run-results.txt"

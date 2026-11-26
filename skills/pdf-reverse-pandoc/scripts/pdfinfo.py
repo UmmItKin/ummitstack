@@ -61,11 +61,16 @@ def pages(pdf):
     return result
 
 
+def links(pdf):
+    """Number of link annotations (web or page links)."""
+    return len(re.findall(r"<a href=", run("pdftohtml", "-xml", "-i", "-zoom", "1", "-stdout", pdf)))
+
+
 def facts(pdf):
     info = run("pdfinfo", pdf)
     get = lambda k: (re.search(rf"^{k}:\s*(.*)$", info, re.M) or [None, ""])[1].strip()
     pg = pages(pdf)
-    return {"pages": len(pg), "tagged": get("Tagged") == "yes", "encrypted": get("Encrypted").startswith("yes"), "form": get("Form") not in ("", "none"),
+    return {"pages": len(pg), "tagged": get("Tagged") == "yes", "encrypted": get("Encrypted").startswith("yes"), "form": get("Form") not in ("", "none"), "links": links(pdf),
             "runs_per_page": [len(p["runs"]) for p in pg], "fonts": fonts(pdf), "images": max(0, len(run("pdfimages", "-list", pdf).splitlines()) - 2)}
 
 

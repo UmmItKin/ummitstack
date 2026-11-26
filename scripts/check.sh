@@ -9,6 +9,8 @@ for t in skills/*/tests/run.sh; do
   echo "== $t"
   sh "$t" || fail=1
 done
+echo "== TLA+ model check"
+sh scripts/tla-check.sh || fail=1
 echo "== shared files must be identical"
 for f in run.py pagescore.py; do
   cmp -s skills/docx-reverse-pandoc/scripts/$f skills/pdf-reverse-pandoc/scripts/$f || { echo "FAIL $f differs between docx-reverse-pandoc and pdf-reverse-pandoc"; fail=1; }

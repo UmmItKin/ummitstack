@@ -2,7 +2,7 @@
 """Usage: verify.py original.pdf out-dir [--no-render] [--accept-unsupported]
 Runs the gates against out-dir/rebuilt.pdf and writes out-dir/gates.json:
   fonts      the fonts the text uses and which are not installed here (a stand-in is used for those)
-  structure  the text layer exists, and no curves or pictures that this workflow cannot redraw
+  structure  the text layer exists, and no curves, pictures, links or form fields that this workflow does not keep
   fidelity   fidelity.py: text, font, size, bold, italic, baseline, width, shapes, page count and size of every run
   look       the pages rendered and scored against the original (needs pdftoppm and ImageMagick)
 Exit 0 when structure and fidelity pass and the look gate did not fail."""
@@ -35,6 +35,10 @@ def main():
         notes.append("no text layer")
     if unsupported and not accept:
         notes.append(f"{unsupported} curves or pictures that are not redrawn")
+    if facts["links"] and not accept:
+        notes.append(f"{facts['links']} links that are not kept")
+    if facts["form"] and not accept:
+        notes.append("form fields that are not kept")
     if facts["encrypted"]:
         notes.append("encrypted")
     gates["structure"] = {"result": "fail" if notes else "pass", "detail": "; ".join(notes) or f"{facts['pages']} pages, text layer present, {sum(len(s) for s, _ in shapes)} line shapes", "lines": notes}

@@ -20,7 +20,7 @@ This is a positional rebuild, not a reflow. Every run of text is placed at its o
 - **Never say "passes" or "matches" from one gate.** Report all four gates and say what was not checked.
 - **Numbers come from scripts.** Use `verify.py` and `pagescore.py`, never a hand-written one-liner.
 - A PDF with no text layer (scanned pages) is not supported: `reverse.py` exits 2. Say so and stop.
-- Curves and pictures are not redrawn. `verify.py` fails on them unless the user accepts the loss with `--accept-unsupported`.
+- Curves, pictures, links and form fields are not kept. `verify.py` fails on them unless the user accepts the loss with `--accept-unsupported`. Tell the user what will be lost before accepting.
 - Every subagent is `sonnet` at low effort, never another model or a higher effort. A subagent only looks; it never edits.
 - At most 3 fix rounds. Then report what is left.
 
@@ -44,4 +44,4 @@ The original PDF embeds its fonts, but the rebuild needs them installed. When `p
 - Continue with the stand-in: run `reverse.py` with `--allow-substitute-fonts` and say in the report that the rebuild uses a different font.
 
 ## What stays different
-Symbol and bullet fonts are not compared by family. Curves, pictures, links and form fields are not kept, and the rebuilt PDF has no tags, so it is not accessible to screen readers. Render scores are informational; with stand-in fonts they show how close the layout is, not how the original fonts look.
+Symbol and bullet fonts are not compared by family. Curves, pictures, links and form fields are not kept (detected, never silent; form field detection is not covered by a test), and the rebuilt PDF has no tags, so it is not accessible to screen readers. Render scores are informational; with stand-in fonts they show how close the layout is, not how the original fonts look.

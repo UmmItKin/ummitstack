@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Usage: make_fixture.py out.pdf [--font NAME] [--scan] [--curve]
+"""Usage: make_fixture.py out.pdf [--font NAME] [--scan] [--curve] [--link]
 Builds a small fictional A4 PDF with Typst: a title, bold and italic words, two sizes, a table and a second page.
---font picks the font (default: the system serif). --scan makes a PDF whose pages are pictures with no text layer. --curve adds a circle, which this workflow cannot redraw."""
+--font picks the font (default: the system serif). --scan makes a PDF whose pages are pictures with no text layer. --curve adds a circle, which this workflow cannot redraw. --link adds a web link, which is not kept."""
 import os, shutil, subprocess, sys, tempfile
 
 BODY = """#set page(paper: "a4", margin: (x: 56pt, y: 60pt))
@@ -28,7 +28,7 @@ def main():
     font = sys.argv[sys.argv.index("--font") + 1] if "--font" in sys.argv else subprocess.run(["fc-match", "-f", "%{family}", "serif"], capture_output=True, text=True).stdout.split(",")[0]
     with tempfile.TemporaryDirectory() as d:
         src = os.path.join(d, "f.typ")
-        open(src, "w").write(BODY.format(font=font) + ("#place(top + left, dx: 300pt, dy: 300pt, circle(radius: 20pt, stroke: 1pt))\n" if "--curve" in sys.argv else ""))
+        open(src, "w").write(BODY.format(font=font) + ("#place(top + left, dx: 300pt, dy: 300pt, circle(radius: 20pt, stroke: 1pt))\n" if "--curve" in sys.argv else "") + ('#place(top + left, dx: 300pt, dy: 400pt, link("https://example.com")[A fictional link])\n' if "--link" in sys.argv else ""))
         if "--scan" not in sys.argv:
             subprocess.run(["typst", "compile", src, out], check=True)
             return
