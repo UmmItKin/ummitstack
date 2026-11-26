@@ -186,6 +186,13 @@ After you rename or move a repo folder by hand and start a new session there, th
 
 </details>
 
+<details>
+<summary><b>starred-list-summary</b>: summarize a GitHub star list</summary>
+
+`/starred-list-summary <list-url or USER/SLUG>` fetches the repositories in one of your GitHub star lists (for example `https://github.com/stars/USER/lists/agent-skill`) and summarizes them by theme, with the most starred, archived and stale ones flagged. GitHub has no REST endpoint for star lists, so it uses the GraphQL API through the `gh` CLI. It is read-only and needs `gh` logged in. With only a user name it shows the lists to pick from.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
