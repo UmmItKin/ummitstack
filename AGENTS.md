@@ -42,6 +42,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | Every skill is checked cold by a fresh low-effort subagent before it is published (own tests miss gaps a reader hits) | `verify-skill` (`static_check.py`, `references/cold-start.md`); its own `tests/run.sh` |
 | Fixtures, examples and tests use generic placeholder text, never wording or layout copied from a document the user gave | `skills/verify-skill/scripts/leak_scan.py` against the user's source files (not stored in the repo), on the staged diff before each commit and on the history |
 | A commit happens only when `check-commit-info` prints exactly `ok` and `leak_scan.py` reports 0 hits, judged from the output and never through a pipe | agent routine; `verify-skill/tests/run.sh` tests the scanner |
+| A hook toggle changes only its own entry in the user settings and never damages the file | `auto-find-best-skill/tests/run.sh` (temporary settings files only) |
 | Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.

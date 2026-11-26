@@ -172,6 +172,13 @@ Builds one PDF with pandoc and xelatex: title page with name and SID, contents, 
 
 </details>
 
+<details>
+<summary><b>auto-find-best-skill</b>: make Claude Code pick the best installed skill in every session</summary>
+
+`/auto-find-best-skill on|off|status` adds or removes one SessionStart hook in `~/.claude/settings.json`. The hook prints a short reminder at the start of every session, so Claude checks the installed skills for the best match before each task and searches with `find-skills` only when none fits. It never installs a skill without asking. It keeps your other settings and hooks, keeps a one-time copy of the original file, and refuses to touch a settings file that is not valid JSON. Claude Code only.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
