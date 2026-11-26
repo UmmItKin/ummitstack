@@ -46,7 +46,6 @@ expect "an email address fails" 1 python3 "$s" "$T/mail"
 mk orphan
 printf '#!/usr/bin/env python3\n"""Usage: lost.py"""\n' > "$T/orphan/scripts/lost.py"
 python3 "$s" "$T/orphan" 2>&1 | grep -q 'WARN scripts/lost.py' && ok "an unreferenced script is warned about" || bad "an unreferenced script is not warned about"
-# leak_scan.py: a private source line in a commit is found, a clean history passes
 L=$here/../scripts/leak_scan.py
 R=$T/repo
 mkdir -p "$R" && cd "$R" && git init -q && git config user.email a@example.com && git config user.name t

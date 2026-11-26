@@ -11,14 +11,14 @@ import graphics
 import pdfinfo
 
 TRACK_MAX = 0.6
-SPACE = 0.25  # width of a space, in em, for text that has leading or trailing spaces
+SPACE_EM = 0.25
 
 
 def core(r):
     """The text without leading and trailing spaces, and the width and left edge of just that text."""
     t = r["text"].strip()
     lead, trail = len(r["text"]) - len(r["text"].lstrip()), len(r["text"]) - len(r["text"].rstrip())
-    return t, r["left"] + lead * SPACE * r["size"], r["width"] - (lead + trail) * SPACE * r["size"]
+    return t, r["left"] + lead * SPACE_EM * r["size"], r["width"] - (lead + trail) * SPACE_EM * r["size"]
 
 
 def q(text):

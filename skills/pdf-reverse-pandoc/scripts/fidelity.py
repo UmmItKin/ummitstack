@@ -11,7 +11,7 @@ import pdfinfo
 from reverse import core, match
 
 
-SYMBOL_FONTS = {"Symbol", "Wingdings", "Webdings"}  # their glyphs are not in the stand-in fonts, so the family is not compared
+SYMBOL_FONTS = {"Symbol", "Wingdings", "Webdings"}
 
 
 def compare(a, b, tol=3.0, width_tol=None, accept_unsupported=False):

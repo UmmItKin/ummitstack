@@ -28,8 +28,7 @@ Fix == /\ status = "in_progress" /\ rounds < MaxRounds
        /\ rounds' = rounds + 1 /\ UNCHANGED <<state, agents, gates, open, status>>
 
 UseAgent == /\ agents < Budget /\ agents' = agents + 1 /\ UNCHANGED <<state, rounds, gates, open, status>>
-(* Record(g): in run.py a failed gate is recorded too but blocks Complete unless an accepted finding covers it; here only passing or accepted gates enter the set. *)
-Record(g) == /\ gates' = gates \cup {g} /\ UNCHANGED <<state, rounds, agents, open, status>>
+RecordPassingOrAccepted(g) == /\ gates' = gates \cup {g} /\ UNCHANGED <<state, rounds, agents, open, status>>
 Open == /\ open < 2 /\ open' = open + 1 /\ status' = "in_progress" /\ UNCHANGED <<state, rounds, agents, gates>>
 Resolve == /\ open > 0 /\ open' = open - 1 /\ UNCHANGED <<state, rounds, agents, gates, status>>
 
@@ -40,11 +39,10 @@ Complete == /\ status = "in_progress"
 
 Next == \/ \E p \in 1..N : Finish(p) \/ Skip(p)
         \/ Fix \/ UseAgent \/ Open \/ Resolve \/ Complete
-        \/ \E g \in {"fonts", "structure", "fidelity", "look"} : Record(g)
+        \/ \E g \in {"fonts", "structure", "fidelity", "look"} : RecordPassingOrAccepted(g)
 
 Spec == Init /\ [][Next]_vars /\ WF_vars(Complete)
 
-(* Safety *)
 CompleteIsProven == status = "complete" =>
     /\ \A p \in 1..N : state[p] \in {"done", "skipped"}
     /\ gates = {"fonts", "structure", "fidelity", "look"} /\ open = 0
@@ -52,5 +50,4 @@ BudgetHolds == agents <= Budget
 RoundsBounded == rounds <= MaxRounds
 NoDoneAfterOpen == \A p \in 1..N : state[p] = "done" => Prefix(p)
 
-(* Liveness is not claimed: a run may stay in progress forever. Fix rounds are bounded, so no loop runs without end. *)
 =============================================================================

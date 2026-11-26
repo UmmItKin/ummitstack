@@ -9,7 +9,7 @@ Warnings: a script with no Usage line, a symbol such as a check mark, a script o
 import os, re, subprocess, sys
 
 DASHES_ARROWS_EMOJI = re.compile("[\u2014\u2192\u2190\u21d2\u27a1\u2b05\U0001f300-\U0001faff]")
-SYMBOLS = re.compile("[\u2600-\u27bf]")  # check marks, crosses, stars: often fine in tool output, so a warning
+DINGBATS = re.compile("[\u2600-\u27bf]")
 HOME_PATH = re.compile(r"(?<![\w.~$])/home/(?!user\b|you\b|name\b|username\b)[A-Za-z0-9_-]+|C:\\Users\\(?!user\b|you\b|name\b|username\b|Public\b|Default\b)[A-Za-z0-9_-]+|/Users/(?!user\b|you\b|name\b|username\b)[A-Za-z0-9_-]+")
 EMAIL = re.compile(r"[\w.+-]+@(?!example\.)[\w-]+\.[\w.-]+")
 
@@ -69,8 +69,8 @@ def main():
         if p.endswith((".md", ".py", ".sh", ".lua", ".json", ".txt", ".typ", ".tla", ".cfg")) and "__pycache__" not in p:
             texts[p] = open(p, encoding="utf-8", errors="replace").read()
     for p, t in texts.items():
-        if SYMBOLS.search(t):
-            warns.append(f"{rel(p)}: contains a symbol character such as a check mark: {SYMBOLS.search(t).group(0)!r}")
+        if DINGBATS.search(t):
+            warns.append(f"{rel(p)}: contains a symbol character such as a check mark: {DINGBATS.search(t).group(0)!r}")
         for what, rx in (("an em dash, arrow or emoji", DASHES_ARROWS_EMOJI), ("a home directory path", HOME_PATH), ("an email address", EMAIL)):
             m = rx.search(t)
             if m:
