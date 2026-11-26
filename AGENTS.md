@@ -46,6 +46,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | Moving project memory copies only, never deletes or overwrites, and previews before it applies | `update-repo-directory-path/tests/run.sh` (temporary Claude folder only, with a checksum of the old folder) |
 | The star list reader pages through every item, sorts by stars, and reports a missing or logged-out gh instead of failing silently | `starred-list-summary/tests/run.sh` (fake `gh`, no network) |
 | Listing Claude Code projects reads only titles and working directories and never prints conversation text | `list-claude-projects/tests/run.sh` (fake Claude folder with a secret word in a message) |
+| The browser opener builds the exact command per browser, keeps Brave on its own profile and passes the URL as one argument | `open-ag/tests/run.sh` (fake `agent-browser`, isolated PATH and HOME) |
 | Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.

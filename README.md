@@ -68,9 +68,9 @@ In Claude Code, the first commit of a session sets `"attribution": {"commit": ""
 </details>
 
 <details>
-<summary><b>open-ag</b>: open a visible Chromium window with the saved profile</summary>
+<summary><b>open-ag</b>: open a visible Chromium, Chrome or Brave window with a saved profile</summary>
 
-`/open-ag <url>` opens the URL in a visible window through `agent-browser`, using the profile at `~/.agent-browser-profile`, then prints the page URL. It uses Chromium or Chrome stable if installed, else agent-browser's own Chrome for Testing. In Codex: `$open-ag <url>`. Needs `agent-browser`.
+`/open-ag <url> [--browser chromium|chrome|brave|testing]` opens the URL in a visible window through `agent-browser`, then prints the page URL. It looks for Chromium, Chrome, Brave and agent-browser's own Chrome for Testing. With one installed it uses it; with two or more it asks you to pick from a menu, and remembers the choice for the session. Chromium, Chrome and Chrome for Testing share the profile at `~/.agent-browser-profile`; Brave has its own at `~/.agent-browser-profile-brave`. In Codex: `$open-ag <url>`. Needs `agent-browser`.
 
 </details>
 
