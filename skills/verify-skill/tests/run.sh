@@ -37,9 +37,9 @@ expect "a script that does not compile fails" 1 python3 "$s" "$T/badsyntax"
 mk dash
 printf 'Wait \xe2\x80\x94 this has an em dash. ok.py\n' >> "$T/dash/SKILL.md"
 expect "an em dash fails" 1 python3 "$s" "$T/dash"
-mk home
-printf 'See /%s/alice/notes ok.py\n' home >> "$T/home/SKILL.md"
-expect "a home directory path fails" 1 python3 "$s" "$T/home"
+mk userpath
+printf 'See /%s/alice/notes ok.py\n' home >> "$T/userpath/SKILL.md"
+expect "a home directory path fails" 1 python3 "$s" "$T/userpath"
 mk mail
 printf 'Mail bob@%s.org ok.py\n' corp >> "$T/mail/SKILL.md"
 expect "an email address fails" 1 python3 "$s" "$T/mail"
