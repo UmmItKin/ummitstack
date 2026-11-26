@@ -6,7 +6,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 
 - Run all skill tests: `sh scripts/check.sh` (also the command for CI). One skill: `sh skills/<name>/tests/run.sh`.
 - The repo is public: use only fictional example content, never personal, school or project details.
-- Commit only when the user says so, and run `check-commit-info` first (stage with explicit paths).
+- Commit only when the user says so (or `commit-regular` is on), and run `check-commit-info` and `leak_scan.py` first (stage with explicit paths). Commits for the PDF skill mention issue #1 in the subject, as `(#1)`; never write `closes`.
 - Prose and slides: no em dashes, no arrow glyphs, no emoji. Do not credit other skills as references.
 - Subagents in these skills are `sonnet` at low effort only.
 - `docx-reverse-pandoc` and `pdf-reverse-pandoc` are phased pipelines (setup, fonts, coverage, reverse, rebuild, verify, fix, report); read `skills/docx-reverse-pandoc/references/phases.md` before changing it.
@@ -40,6 +40,8 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | Scanned PDFs and unredrawn curves or pictures stop the run unless accepted | `reverse.py` exit 2; `verify.py` structure gate |
 | The run state machine keeps its invariants (complete only with proof, bounded rounds and budget) | `specs/pipeline.tla` via `scripts/tla-check.sh`, part of `scripts/check.sh` |
 | Every skill is checked cold by a fresh low-effort subagent before it is published (own tests miss gaps a reader hits) | `verify-skill` (`static_check.py`, `references/cold-start.md`); its own `tests/run.sh` |
+| Fixtures, examples and tests use generic placeholder text, never wording or layout copied from a document the user gave | `skills/verify-skill/scripts/leak_scan.py` against the user's source files (not stored in the repo), on the staged diff before each commit and on the history |
+| A commit happens only when `check-commit-info` prints exactly `ok` and `leak_scan.py` reports 0 hits, judged from the output and never through a pipe | agent routine; `verify-skill/tests/run.sh` tests the scanner |
 | Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.

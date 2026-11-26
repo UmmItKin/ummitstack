@@ -59,6 +59,12 @@ expect "and ignores a phrase when told to" 0 python3 "$L" --source "$T/private.t
 git commit -q -m "add"
 expect "and finds it in the history" 1 python3 "$L" --source "$T/private.txt" --history
 expect "and finds a private line in the commit message" 1 python3 "$L" --source "$T/private.txt" --staged --message "another private sentence here"
+printf 'a      b      c\n' >> "$T/private.txt"
+printf 'x i f y\n' > b.txt && git add b.txt
+expect "a private line is judged by its length after spaces collapse (found by a rewrite check)" 0 python3 "$L" --source "$T/private.txt" --staged
+printf 'the quick brown fox jumps\n' >> "$T/private.txt"
+printf 'the quick brown foxes jump over\n' > c.txt && git add c.txt
+expect "a private line does not match inside a longer word (found by a history scan)" 0 python3 "$L" --source "$T/private.txt" --staged
 cd "$here"
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]

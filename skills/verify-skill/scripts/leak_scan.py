@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Usage: leak_scan.py --source FILE [--source FILE ...] [--ignore PHRASE ...] (--staged | --history [REV-RANGE]) [--message TEXT]
 Checks that nothing from private source files (a .docx, .pdf or text file the user gave you) ended up in a commit.
-It reads every line of 14 or more characters from the sources, then searches the added lines of the staged diff
+It reads every line of 14 or more characters (after collapsing spaces) from the sources, then searches the added lines of the staged diff
 (--staged, plus --message for the commit message) or of every commit in a range (--history, default all of HEAD).
-Words are compared ignoring case and spacing. Prints the commit and the first 30 characters of each hit, never the
+Lines are compared ignoring case and spacing, and only as whole words (a heading does not match inside a longer word). Prints the commit and the first 30 characters of each hit, never the
 whole line. Exit 1 on any hit. --ignore skips a phrase that is generic, such as a heading every document has."""
 import re, subprocess, sys, zipfile
 
@@ -24,7 +24,7 @@ def phrases(path):
         raw = sh("pdftotext", "-layout", path, "-")
     else:
         raw = open(path, encoding="utf-8", errors="ignore").read()
-    return {norm(l) for l in raw.split("\n") if len(l.strip()) >= 14}
+    return {n for n in (norm(l) for l in raw.split("\n")) if len(n) >= 14}
 
 
 def main():
@@ -61,7 +61,7 @@ def main():
     hits = 0
     for name, diff, msg in jobs:
         added = norm("\n".join(l[1:] for l in diff.split("\n") if l.startswith("+") and not l.startswith("+++")) + "\n" + msg)
-        found = sorted(p for p in bad if p in added)
+        found = sorted(p for p in bad if re.search(r"(?<!\w)" + re.escape(p) + r"(?!\w)", added))
         for p in found:
             hits += 1
             print(f"HIT {name}: {p[:30]!r}...")
