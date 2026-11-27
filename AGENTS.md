@@ -48,6 +48,7 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 | Listing Claude Code projects reads only titles and working directories and never prints conversation text | `list-claude-projects/tests/run.sh` (fake Claude folder with a secret word in a message) |
 | The browser opener builds the exact command per browser, keeps Brave on its own profile and passes the URL as one argument | `open-ag/tests/run.sh` (fake `agent-browser`, isolated PATH and HOME) |
 | A change to a skill is proven on the installed copy in a throwaway HOME, never against the real `~/.claude` | `.claude/skills/verify-ummitstack` (`doctor.sh`, `prove-install.sh`, `features/`) |
+| The auto-find-best-skill toggle never loses or damages the user's settings, checked on every settings file in a stated space; known findings are listed, a new violation fails | `.claude/skills/verify-settings-toggle` (`check.py`, `prove-catches.py`, `sync.sh`), run by `scripts/check.sh` |
 | Tools are listed with an install command, never installed by the skill | `pdf-reverse-pandoc/scripts/setup.sh` prints, never runs `sudo` |
 
 Run everything with `sh scripts/check.sh`. When corrected again, fix the mistake and add the rule here; if a rule is already listed and nothing enforces it, enforce it at a higher level in the same change.

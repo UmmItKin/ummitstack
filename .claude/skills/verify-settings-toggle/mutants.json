@@ -1,0 +1,44 @@
+[
+ {
+  "name": "drops-your-other-hooks-on-on",
+  "old": "    rest = [g for g in groups(data) if not ours(g)]\n    if a[0] == \"on\":",
+  "new": "    rest = [] if a[0] == \"on\" else [g for g in groups(data) if not ours(g)]\n    if a[0] == \"on\":",
+  "expect": "on-changes-more-than-its-entry:plain"
+ },
+ {
+  "name": "replaces-the-whole-hooks-object",
+  "old": "data.setdefault(\"hooks\", {})[\"SessionStart\"] = rest",
+  "new": "data[\"hooks\"] = {\"SessionStart\": rest}",
+  "expect": "on-changes-more-than-its-entry:plain"
+ },
+ {
+  "name": "off-drops-your-other-session-start-hooks",
+  "old": "            hooks[\"SessionStart\"] = rest",
+  "new": "            hooks.pop(\"SessionStart\", None)",
+  "expect": "off-removes-more-than-its-entry:plain"
+ },
+ {
+  "name": "on-adds-a-second-entry",
+  "old": "    rest = [g for g in groups(data) if not ours(g)]",
+  "new": "    rest = list(groups(data))",
+  "expect": "on-twice-differs:plain"
+ },
+ {
+  "name": "overwrites-an-invalid-file",
+  "old": "        sys.exit(f\"error: {path} is not valid JSON ({e}); not changed\")",
+  "new": "        return {}",
+  "expect": "changed-an-unreadable-file:invalid-json"
+ },
+ {
+  "name": "status-always-says-off",
+  "old": "        print(f\"{MARK}: {'on' if on else 'off'}\")",
+  "new": "        print(f\"{MARK}: off\")",
+  "expect": "status-wrong:plain"
+ },
+ {
+  "name": "off-wipes-your-other-settings",
+  "old": "        if not hooks:\n            data.pop(\"hooks\", None)",
+  "new": "        if not hooks:\n            data.clear()",
+  "expect": "off-removes-more-than-its-entry:plain"
+ }
+]
