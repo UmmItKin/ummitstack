@@ -41,5 +41,9 @@ FAKE_RC=5 run both sh "$p" >"$T/trouble.txt" 2>&1; code=$?
 rm -f "$T/both.log"; run both sh "$p" work >/dev/null 2>&1
 grep -q "account get --output json --no-input --profile work" "$T/both.log" && ok "the profile is passed through" || bad "the profile was not passed: $(cat "$T/both.log")"
 grep -q "account get --output json --no-input" "$T/both.log" && ! grep -qiE "login|password" "$T/both.log" && ok "it only reads: no login, no password" || bad "preflight did something besides read"
+mail=$(sh "$here/mail.sh" 2>&1) || bad "mail.sh reported a failure or crashed"
+printf '%s\n' "$mail" | grep -E '^(PASS|FAIL)'
+pass=$((pass + $(printf '%s\n' "$mail" | grep -c '^PASS')))
+fail=$((fail + $(printf '%s\n' "$mail" | grep -c '^FAIL')))
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]
