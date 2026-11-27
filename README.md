@@ -207,6 +207,13 @@ Teaches the agent how to behave with your Proton account (Mail, Drive, Calendar,
 
 </details>
 
+<details>
+<summary><b>open-android-screen</b>: see a USB-connected Android phone's screen to debug it</summary>
+
+`/open-android-screen` checks that `adb` is installed and that exactly one phone is connected and authorized. If something is missing it says what to do (install adb, connect the cable and turn on USB debugging, tap Allow on the phone) and asks you once before checking again. When it is ready it opens a live window with `scrcpy` and takes a screenshot the agent can look at. It is view only: no taps, typing, installs or file transfer unless you ask. Screenshots go to the temp folder, never into a repo, and the device serial is never printed. Needs `adb` (Arch: `android-tools`) and optionally `scrcpy`.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
