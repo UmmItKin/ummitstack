@@ -214,6 +214,13 @@ Teaches the agent how to behave with your Proton account (Mail, Drive, Calendar,
 
 </details>
 
+<details>
+<summary><b>exam-mode</b>: a timed practice exam on a DOCX paper</summary>
+
+`/exam-mode <url or topic> [duration]` writes a DOCX paper from a webpage or a topic and runs it like a real exam. It records the start and end time (one hour by default, or any length such as `90m` or `1h30m`), watches the file with `inotifywait` and its modification time so every save is recorded and kept as a version, and announces the time left only by `notify-send`. During the exam the agent gives the paper and nothing else: no hints and no answers. When the time is up, or you say "submit", it grades the last version saved before the end, ignores later edits, and gives feedback and the answers. Needs `inotifywait` (inotify-tools), `notify-send` (libnotify) and `pandoc`.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
