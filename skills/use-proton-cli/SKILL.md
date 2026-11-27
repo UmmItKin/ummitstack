@@ -12,8 +12,11 @@ Arguments: $ARGUMENTS
 
 ## Start
 1. Run `sh <skill-dir>/scripts/preflight.sh [profile]`. It prints the command, its version and whether someone is signed in, and never prints account data.
-   - Not installed (exit 1): say so and give the install page it printed. Stop.
-   - Nobody signed in (exit 2): tell the user to run `proton account login` in their own terminal (in Claude Code they can type `! proton account login`). Never ask for a password, a code or a recovery phrase in the chat.
+   - Ready (exit 0): carry on with the task.
+   - Not installed (exit 1) or nobody signed in (exit 2): stop and let the user set it up. Do not install anything, do not run `proton account login`, and never ask for a password, a code or a recovery phrase in the chat.
+     1. Tell the user in a few lines what to do themselves. Install it from https://proton-cli.lerchster.dev/install/ (Homebrew, APT, AUR, Nix and npm are there; the one-liner is `curl -fsSL https://raw.githubusercontent.com/roman-16/proton-cli/main/scripts/install.sh | sh`, which runs a script from the internet, so they may read it first). Then sign in with `proton account login` in their own terminal. In Claude Code they can type `! proton account login`.
+     2. Ask once, with a single-select menu (AskUserQuestion, or the same two answers in plain text): "I installed it and signed in, check again" or "Not now".
+     3. On "check again", run the preflight again. If it is ready, do the task they first asked for. If not, say what is still missing and ask once more. On "Not now", stop and say they can ask again later.
    - Could not tell (exit 3): Proton or the network is having trouble. Retry a read once; do not touch anything that changes data.
 2. Learn the commands you need from the tool, not from memory. Run `proton <command> --help` before the first use of a command. For anything bigger than a listing, run `proton skill --body-only` once; it is long (about 29 KB), so read it only when the task needs it. The full reference is https://proton-cli.lerchster.dev/about/commands/.
 3. On every call add `--output json --no-input`, and `--profile <name>` when the user names an account. Use the short ID a listing printed rather than searching again, because the search index lags a few seconds behind a change.
