@@ -13,6 +13,13 @@ A public collection of agent skills, installed with `npx skills add UmmItKin/umm
 - Subagents in these skills are `sonnet` at low effort only.
 - `docx-reverse-pandoc` and `pdf-reverse-pandoc` are phased pipelines (setup, fonts, coverage, reverse, rebuild, verify, fix, report); read `skills/docx-reverse-pandoc/references/phases.md` before changing it.
 
+## Arch Linux only
+
+Every script and test here is written and tested on Arch Linux only (GNU coreutils, `stat -c`, `date -d`, `inotifywait`, `notify-send`, pacman package names). On macOS or Windows they may fail or behave differently.
+
+- If you are running on macOS or Windows (check `uname -s`, or the platform in your environment), tell the user before running any script or test that the skills were only tested on Arch Linux and may not work here. `scripts/check.sh` prints the same warning on its own.
+- Do not port the scripts to macOS or Windows, and do not open a pull request or issue that does. Report what failed to the user instead.
+
 ## Never add to a commit
 
 `check-commit-info` checks the staged files and the message. These must not go into a commit, its message or its author line, because the repo is public:

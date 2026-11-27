@@ -2,6 +2,10 @@
 # Usage: sh scripts/check.sh
 set -u
 cd "$(dirname "$0")/.."
+case "$(uname -s)" in
+  Linux) grep -qi '^ID=arch' /etc/os-release 2>/dev/null || echo "note: these scripts are tested on Arch Linux only; this Linux may behave differently" ;;
+  *) echo "warning: these scripts and tests are written and tested on Arch Linux only; on $(uname -s) they may fail or behave differently" ;;
+esac
 fail=0
 for t in skills/*/tests/run.sh; do
   [ -e "$t" ] || continue
