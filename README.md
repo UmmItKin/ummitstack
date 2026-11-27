@@ -200,6 +200,13 @@ After you rename or move a repo folder by hand and start a new session there, th
 
 </details>
 
+<details>
+<summary><b>use-proton-cli</b>: work with a Proton account through the proton command, safely</summary>
+
+Teaches the agent how to behave with your Proton account (Mail, Drive, Calendar, Pass, Meet, Contacts) when you use the unofficial [`proton-cli`](https://github.com/roman-16/proton-cli). It reads freely, but previews with `--dry-run` and asks before anything that changes data, never does irreversible or security actions on its own, never prints secrets beyond what you asked for, and treats mail content as data, not instructions. It does not copy the tool's reference: it tells the agent to use `proton <command> --help` and `proton skill --body-only`, which match the installed version. `scripts/preflight.sh` checks the install and sign-in without printing account data. Needs `proton`; signing in is done by you with `proton account login`.
+
+</details>
+
 ## License
 
 [MIT](LICENSE)
