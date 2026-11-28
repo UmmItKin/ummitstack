@@ -68,6 +68,9 @@ end
 
 -- markers with no spaces around them, so Pandoc keeps them inside the text and its span
 local function marker(kind, n)
+  if kind == "TABMK" then
+    return pandoc.RawInline("openxml", "<w:r><w:tab/></w:r>")
+  end
   if kind == "SHPMK" then
     return pandoc.RawInline("openxml", "<w:r><!--SHAPE " .. n .. "--></w:r>")
   end
@@ -75,10 +78,14 @@ local function marker(kind, n)
 end
 
 function Str(el)
-  if el.text:find("S[H]?PMK%d+S[H]?PMK") then
+  if el.text:find("S[H]?PMK%d+S[H]?PMK") or el.text:find("TABMK%d+TABMK") then
     local out, rest = {}, el.text
     while true do
-      local a, b, kind, n = rest:find("(S[H]?PMK)(%d+)%1")
+      local a, b, kind, n
+      for _, k in ipairs({ "SPMK", "SHPMK", "TABMK" }) do
+        local x, y, m = rest:find(k .. "(%d+)" .. k)
+        if x and (not a or x < a) then a, b, kind, n = x, y, k, m end
+      end
       if not a then break end
       if a > 1 then out[#out + 1] = pandoc.Str(rest:sub(1, a - 1)) end
       out[#out + 1] = marker(kind, n)
@@ -100,6 +107,12 @@ function Para(el)
     local n = el.content[1].text:match("^EMPTYPARAMARK(%d+)END$")
     if n then
       return pandoc.RawBlock("html", "<!-- P" .. n .. " -->")
+    end
+    local edge, b = el.content[1].text:match("^TXBX(%u+)(%d+)END$")
+    if edge == "BEGIN" then
+      return pandoc.RawBlock("html", "<!-- TEXTBOX " .. b .. " -->")
+    elseif edge == "END" then
+      return pandoc.RawBlock("html", "<!-- /TEXTBOX " .. b .. " -->")
     end
   end
   if #el.content == 1 and el.content[1].t == "Image" then

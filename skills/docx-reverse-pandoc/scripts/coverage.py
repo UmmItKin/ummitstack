@@ -11,7 +11,7 @@ STATE = {
             {"b", "bCs", "i", "iCs", "u", "strike", "dstrike", "vertAlign"}, {"lang", "noProof", "webHidden", "rtl", "cs", "rsid"}),
     "pPr": ({"pStyle", "jc", "ind", "spacing", "keepNext", "keepLines", "pageBreakBefore", "pBdr", "shd", "tabs", "contextualSpacing",
              "widowControl", "outlineLvl", "textAlignment", "suppressAutoHyphens", "snapToGrid", "autoSpaceDE", "autoSpaceDN", "adjustRightInd",
-             "rPr", "wordWrap", "overflowPunct", "bidi", "mirrorIndents", "cnfStyle"}, {"numPr"}, {"rsid"}),
+             "rPr", "wordWrap", "overflowPunct", "bidi", "mirrorIndents", "cnfStyle", "textDirection"}, {"numPr"}, {"rsid"}),
     "tblPr": ({"tblStyle", "tblW", "tblInd", "tblLayout", "tblLook", "shd", "tblBorders", "tblCellMar", "jc", "tblCellSpacing",
                "tblStyleRowBandSize", "tblStyleColBandSize"}, set(), {"tblCaption", "tblDescription"}),
     "trPr": ({"trHeight", "cnfStyle", "cantSplit", "tblHeader", "gridBefore", "gridAfter", "wBefore", "wAfter", "jc"}, set(), set()),
@@ -61,7 +61,7 @@ def ledger(path):
         out.append({"unit": f"{ctx}/{tag}", "count": n, "state": state})
     kept = len(re.findall(SHAPE_RE, doc, re.S))
     if kept:
-        out.append({"unit": "floating shapes without text (raw XML)", "count": kept, "state": "carried"})
+        out.append({"unit": "floating shapes and their text boxes (raw XML, box text in doc.md)", "count": kept, "state": "carried"})
     rest = re.sub(SHAPE_RE, "", doc, flags=re.S)
     for name, pattern, state in STRUCTURE:
         n = len(re.findall(pattern, rest, re.S))

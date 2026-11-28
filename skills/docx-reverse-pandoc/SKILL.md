@@ -18,7 +18,7 @@ A rebuild that looks right in the XML can still be wrong on the page, and one th
 - **Fonts first.** If the text uses a font that is not installed, say which before doing anything else. Do not render, count pages or call the look checked until the user has the fonts or has said to go on without them. A render with substitute fonts proves nothing about Word.
 - **Never say "passes" or "matches" from one gate.** The structure compare passed while tables were drawn wrongly. Report all four gates and say what was not checked.
 - **Numbers come from scripts.** Never compute a score or count with a hand-written one-liner. Use `verify.py` and `pagescore.py`.
-- Some features are not kept (text boxes, floating objects, comments, content controls other than the table of contents). `coverage.py` lists them as `unhandled`. Stop and ask, or suggest python-docx instead.
+- Some features are not kept (VML-only text boxes, shapes nested in a text box, comments, content controls other than the table of contents). `coverage.py` lists them as `unhandled`. Stop and ask, or suggest python-docx instead. Floating shapes and Word text boxes are kept: box text sits between `<!-- TEXTBOX N -->` markers in `doc.md`.
 - Every subagent is `sonnet` at low effort, never another model or a higher effort. A subagent only looks; it never edits.
 - At most 3 fix rounds. Then report what is left.
 - If a gate fails and cannot be fixed, tell the user what is lost and let them decide. If they accept, record it as an accepted finding (see `references/phases.md`). If nobody can decide, end with `run.py stop <out> "<reason>"`, which writes `REPORT.md` as an incomplete run. Never pass `--accept-unsupported` or accept a finding on your own.
@@ -37,7 +37,7 @@ Record each with `run.py phase <out> <id> done` (ids: `setup`, `fonts`, `coverag
 
 ## Editing doc.md
 - Keep `::: {custom-style="Name"}` blocks and `[text]{custom-style="Name"}` spans. The attribute maps to a Word style; a class like `{.Name}` does not.
-- Keep the raw `{=openxml}` page breaks and tabs, the `<!-- TOC -->` line and the `<!-- P12 -->` lines (one empty paragraph each). Pandoc drops these when it reads a DOCX, so the scripts put them back.
+- Keep the raw `{=openxml}` page breaks, tabs and `<!--SHAPE N-->` runs, the `<!-- TOC -->` line, the `<!-- P12 -->` lines (one empty paragraph each) and the `<!-- TEXTBOX N -->` / `<!-- /TEXTBOX N -->` pairs. Text and pictures between a pair go inside that text box. Pandoc drops these when it reads a DOCX, so the scripts put them back.
 - `custom-style="DF3"` and `custom-style="DP2"` stand for direct formatting. Keep them on the text they cover; their definitions are in `reference.docx`.
 - Paragraph formatting is copied back from the original by matching text, so a paragraph whose text you change keeps the default style.
 - Math is already LaTeX. A formula that was an image is not converted: leave a placeholder and tell the user.
@@ -53,6 +53,6 @@ Never download fonts yourself. Re-run `--missing-fonts` after the user installs.
 The rebuilt file names the same fonts as the original and embeds none, so whoever opens it needs them installed. The inventory says which are missing here and names an installable look-alike where one exists (Carlito for Calibri, Caladea for Cambria). Corbel and the other Windows and Office fonts have no free look-alike; say so, and ask the user to copy them into `~/.local/share/fonts/` if they want the layout checked here.
 
 ## What stays different
-Caption numbers are kept as plain text and no longer renumber on their own, and anything floating or in a text box is not kept. A LibreOffice render can also differ from Word for reasons not in the file: it does not resolve theme fonts, so default text and text with an explicit font name can fall back to different fonts. Name what you saw and do not call the result identical unless the render shows it with the real fonts installed.
+Caption numbers are kept as plain text and no longer renumber on their own. Floating shapes keep their raw XML, so their size and place cannot be edited in `doc.md`, only the text inside a box can. A LibreOffice render can also differ from Word for reasons not in the file: it does not resolve theme fonts, so default text and text with an explicit font name can fall back to different fonts. Name what you saw and do not call the result identical unless the render shows it with the real fonts installed.
 
 Read `references/notes.md` for how each part is restored and why. Run `sh tests/run.sh` after any change to the scripts.

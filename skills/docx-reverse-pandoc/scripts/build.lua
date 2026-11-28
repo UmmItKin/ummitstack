@@ -69,6 +69,10 @@ local function toc(el)
     if n and empties[tonumber(n)] then
       return pandoc.RawBlock("openxml", empties[tonumber(n)])
     end
+    local close, b = el.text:match("^%s*<!%-%-%s*(/?)TEXTBOX (%d+)%s*%-%->%s*$")
+    if b then
+      return pandoc.RawBlock("openxml", "<w:p><w:r><w:t>TXBX" .. (close == "/" and "END" or "BEGIN") .. b .. "END</w:t></w:r></w:p>")
+    end
   end
   if el.format == "html" and el.text:match("^%s*<!%-%-%s*TOC%s*%-%->%s*$") then
     local t = io.open("toc.xml")

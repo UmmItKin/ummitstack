@@ -26,6 +26,7 @@ python3 "$here/make_fixture.py" "$T/f.docx"
 python3 "$here/make_fixture.py" "$T/box.docx" --textbox
 python3 "$here/make_fixture.py" "$T/font.docx" --missing-font
 python3 "$here/make_fixture.py" "$T/shape.docx" --shape
+python3 "$here/make_fixture.py" "$T/wps.docx" --wps-textbox
 
 echo "== the good path =="
 expect "reverse accepts a document whose text fonts are installed" 0 sh "$s/reverse.sh" "$T/f.docx" "$T/out"
@@ -54,7 +55,7 @@ expect "the fidelity check fails when an alignment is lost" nonzero python3 "$s/
 python3 "$s/fidelity.py" "$T/f.docx" "$T/lost.docx" 2>/dev/null | grep -q "jc" && ok "and the report names the property" || bad "the report does not name the property"
 
 echo "== mistake: a property nothing keeps (text box) =="
-expect "the coverage ledger flags a text box" 1 python3 "$s/coverage.py" "$T/box.docx"
+expect "the coverage ledger still flags a VML-only text box" 1 python3 "$s/coverage.py" "$T/box.docx"
 expect "and accepts it when told to" 0 python3 "$s/coverage.py" "$T/box.docx" --accept "text boxes,legacy pictures and shapes"
 expect "and a document without one passes" 0 python3 "$s/coverage.py" "$T/f.docx"
 
@@ -63,6 +64,19 @@ expect "the coverage ledger carries a floating shape without text" 0 python3 "$s
 expect "reverse and build keep it" 0 sh -c "sh '$s/reverse.sh' '$T/shape.docx' '$T/shape-out' && sh '$T/shape-out/build.sh'"
 python3 -c "import zipfile,sys;d=zipfile.ZipFile(sys.argv[1]).read('word/document.xml').decode();sys.exit(not ('<wp:anchor' in d and 'xmlns:mc=' in d and 'SHAPE' not in d))" "$T/shape-out/rebuilt.docx" && ok "and the rebuilt file holds the anchored shape" || bad "the rebuilt file lost the anchored shape"
 expect "rebuilt XML with the shape parses" 0 python3 "$here/check_xml.py" "$T/shape-out/rebuilt.docx"
+
+echo "== mistake: a Word text box was unhandled, so its answer boxes could not be filled =="
+expect "the coverage ledger carries a wps text box with its VML fallback" 0 python3 "$s/coverage.py" "$T/wps.docx"
+expect "reverse and build keep it" 0 sh -c "sh '$s/reverse.sh' '$T/wps.docx' '$T/wps-out' && sh '$T/wps-out/build.sh'"
+sed -n '/<!-- TEXTBOX 1 -->/,/<!-- \/TEXTBOX 1 -->/p' "$T/wps-out/doc.md" | grep -q "boxed one" && ok "the box text is editable in doc.md between TEXTBOX markers" || bad "the box text is not in doc.md"
+grep -qF 'Label one:`<w:r><w:tab/></w:r>`{=openxml}\_' "$T/wps-out/doc.md" && ok "a tab comes back with no padding spaces" || bad "a tab came back with padding spaces or was lost"
+expect "the fidelity check passes on the box paragraphs" 0 python3 "$s/fidelity.py" "$T/wps.docx" "$T/wps-out/rebuilt.docx"
+python3 -c "import zipfile,sys,re;d=zipfile.ZipFile(sys.argv[1]).read('word/document.xml').decode();sys.exit(not (d.count('<w:txbxContent')==2 and d.count('boxed one')==2 and d.count('w:textDirection')==2 and not re.search('TXBX|SHPMK|SHAPE ',d)))" "$T/wps-out/rebuilt.docx" && ok "and both copies (Choice, Fallback) hold the text and its textDirection, with no markers left" || bad "the text box content was not put back in both copies"
+python3 -c "import base64,sys;open(sys.argv[1],'wb').write(base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='))" "$T/wps-out/dot.png"
+sed -i 's/boxed one/edited box/; /<!-- \/TEXTBOX 1 -->/i ![](dot.png){width=1in}\n' "$T/wps-out/doc.md"
+sh "$T/wps-out/build.sh" >/dev/null 2>&1
+python3 -c "import zipfile,sys,re;d=zipfile.ZipFile(sys.argv[1]).read('word/document.xml').decode();b=re.findall(r'<w:txbxContent>.*?</w:txbxContent>',d,re.S);ids=re.findall(r'<wp:docPr [^>]*?id=\"(\d+)',d);sys.exit(not (len(b)==2 and all('edited box' in x and '<wp:inline' in x for x in b) and len(ids)==len(set(ids))))" "$T/wps-out/rebuilt.docx" && ok "an edit and a picture added in doc.md land inside both copies of the box, with unique picture ids" || bad "an edit or picture in the box did not reach both copies"
+expect "rebuilt XML with the edited box parses" 0 python3 "$here/check_xml.py" "$T/wps-out/rebuilt.docx"
 
 echo "== mistake: working before checking the fonts =="
 expect "reverse refuses a missing text font" 3 sh "$s/reverse.sh" "$T/font.docx" "$T/font-out"

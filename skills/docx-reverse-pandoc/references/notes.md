@@ -35,13 +35,21 @@ A table of contents is a content control holding a field. Pandoc reads its entri
 
 - Pandoc drops empty paragraphs, tab characters, text colours, sizes, fonts, paragraph alignment and spacing. Tested: the first rebuild had 4 of 115 empty paragraphs, no colours, and a different page count.
 - Empty body paragraphs are saved verbatim in `empty-paragraphs.txt`. The reading copy replaces each with a marker, `reverse.lua` turns the marker into a `<!-- P12 -->` line, and `build.lua` puts the saved XML back. Tested: 20 pages against 20.
-- Tabs are marked like page breaks and come back as raw `<w:tab/>` runs.
+- Tabs are marked `TABMK1TABMK` with no spaces around it and come back as raw `<w:tab/>` runs. Tested: the older ` TABMARK ` marker left a real space on each side of the tab (`Label one:  ____`).
 - Direct formatting of a run (colour, size, font, shading, highlight, character spacing) and of a body paragraph (alignment, indent, spacing, tab stops, borders, keep-with-next) becomes a named style, `DF1`, `DP1` and so on, added to the reading copy and to `reference.docx`. Pandoc reads a named style as `custom-style`, so it survives. Tested: the red, orange and green severity labels came back.
 - Paragraphs in tables are not given `DP` styles. Their alignment, shading, row heights and look flags come from `table-cells.txt` and `table-props.json` in `postprocess.py`.
 - Pandoc follows the `basedOn` chain when it looks for captions, so a style based on `Caption` is still a caption. The caption `DP` style copies the caption formatting instead of inheriting it. Tested.
 - A caption next to a table is turned into the table's title by Pandoc and moved above it, and the table style is attached to that title. Without the title the table loses its style, so `table-styles.txt` keeps each table's style and `build.lua` sets it. Tested.
 - `SEQ` fields are replaced by their current number, so captions read "Table 2: ..." as plain text and do not renumber.
 - Empty rows in a table are dropped by Pandoc. `table-cells.txt` marks each original row `R` or `E` and `postprocess.py` puts the empty ones back when the counts allow it. Tested: it brought back the blank page the original had.
+
+## Floating shapes and text boxes
+
+- A floating shape (`mc:AlternateContent`) leaves as raw XML in `shapes/N.xml`, with `<w:r><!--SHAPE N--></w:r>` in `doc.md`, and `postprocess.py` puts it back with fresh drawing ids.
+- A text box inside such a shape keeps its text editable. `extract_parts.py` moves the paragraphs of the `mc:Choice` copy to just after the anchoring paragraph, between `<!-- TEXTBOX N -->` and `<!-- /TEXTBOX N -->` in `doc.md`. `postprocess.py` cuts them out again and fills every `w:txbxContent` copy of the shape (Choice and the VML Fallback) with them, giving each copy its own picture ids. Tested on a document with 18 text boxes: 36 copies back, text, `textDirection` and pictures added in `doc.md` inside both.
+- Edit only between the markers. A picture added there sits inside the box; give it `{width=...}`, because the box has a fixed size and clips what does not fit.
+- `original-flat.xml` is the original with the boxes moved the same way, so the format transfer can match box paragraphs, and an anchoring paragraph matches by its `SHPMKnSHPMK` text.
+- A shape inside another shape's text box, and a VML-only text box with no `mc:AlternateContent`, are still unhandled.
 
 ## Math
 
@@ -52,7 +60,7 @@ A table of contents is a content control holding a field. Pandoc reads its entri
 
 ## Will not round trip
 
-- Text boxes, shapes, charts, SmartArt.
+- VML-only text boxes, shapes nested in a text box, charts, SmartArt.
 - Content controls other than the table of contents, and form fields.
 - Fields other than the table of contents, such as cross-references and `SEQ` numbers.
 - Comments and tracked changes. By default Pandoc accepts tracked changes; `--track-changes=all` keeps them as spans.

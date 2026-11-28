@@ -130,7 +130,8 @@ PPR_AFTER_NUMPR = ("suppressLineNumbers|pBdr|shd|tabs|suppressAutoHyphens|kinsok
 def para_list(xml):
     out = []
     for m in re.finditer(r"<w:p(?: [^>]*)?>.*?</w:p>", xml, re.S):
-        text = "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", m.group()))
+        # a shape marker counts as its SHPMKnSHPMK text in original-flat.xml, so a paragraph holding only a shape still gets its format
+        text = "".join(t or f"SHPMK{n}SHPMK" for t, n in re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>|<!--SHAPE (\d+)-->", m.group()))
         text = re.sub(r"\s+", " ", html.unescape(text)).strip()
         if text:
             out.append((text, m))
@@ -163,8 +164,20 @@ def transfer_paragraph_formats(original_xml, rebuilt_xml):
     return rebuilt_xml
 
 
+# the marker paragraphs come back indented and with a pPr from the format transfer, so match any paragraph holding the marker
+TXBX_BLOCK = r"<w:p\b(?:(?!</w:p>).)*?TXBXBEGIN(\d+)END(?:(?!</w:p>).)*</w:p>(.*?)<w:p\b(?:(?!</w:p>).)*?TXBXEND\1END(?:(?!</w:p>).)*</w:p>"
+
+
 def restore_shapes(s, original, folder):
-    """Put back the raw floating shapes kept by extract_parts.py, with the namespaces they need."""
+    """Put back the raw floating shapes kept by extract_parts.py, with the namespaces they need, and move each text box's paragraphs
+    from between its marker paragraphs back into every txbxContent copy of the shape."""
+    boxes = {}
+
+    def cut(m):
+        boxes[m.group(1)] = m.group(2).strip() if "<w:p" in m.group(2) else "<w:p/>"
+        return ""
+
+    s = re.sub(TXBX_BLOCK, cut, s, flags=re.S)
     marks = re.findall(r"<w:r><!--SHAPE (\d+)--></w:r>", s)
     if not marks:
         return s
@@ -173,6 +186,11 @@ def restore_shapes(s, original, folder):
         x = open(os.path.join(folder, "shapes", m.group(1) + ".xml"), encoding="utf-8").read()
         x = re.sub(r'(<wp:docPr\b[^>]*?\bid=")\d+', lambda d: d.group(1) + str(90000 + int(m.group(1)) * 10), x)
         x = re.sub(r'(<v:shape\b[^>]*?\bo:spid=")[^"]*', lambda d: d.group(1) + "_x0000_s" + str(9000 + int(m.group(1))), x)
+        if m.group(1) in boxes:
+            # each copy (Choice, Fallback) gets its own picture ids, or Word reports unreadable content
+            parts = x.split("<!--TXBX-->")
+            x = parts[0] + "".join(re.sub(r'(<wp:docPr\b[^>]*?\bid=")(\d+)', lambda d, k=k: d.group(1) + str(int(d.group(2)) + 100000 * k), boxes[m.group(1)]) + p
+                                   for k, p in enumerate(parts[1:]))
         return "<w:r>" + x + "</w:r>"
 
     s = re.sub(r"<w:r><!--SHAPE (\d+)--></w:r>", shape, s)
@@ -220,7 +238,8 @@ def main():
                 elif widths:
                     print(f"postprocess.py: {len(tables)} tables but {len(widths)} widths listed; table widths not applied", file=sys.stderr)
                 original = zipfile.ZipFile(ref).read("word/document.xml").decode("utf-8")
-                s = transfer_paragraph_formats(original, s)
+                flat = os.path.join(os.path.dirname(os.path.abspath(out)), "original-flat.xml")
+                s = transfer_paragraph_formats(open(flat, encoding="utf-8").read() if os.path.exists(flat) else original, s)
                 s = restore_shapes(s, original, os.path.dirname(os.path.abspath(out)))
                 data = s.encode("utf-8")
             zout.writestr(item, data)

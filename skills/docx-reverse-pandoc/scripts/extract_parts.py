@@ -7,7 +7,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import inventory
 
 DF_TAGS = ("rFonts", "color", "sz", "szCs", "highlight", "shd", "caps", "smallCaps", "spacing", "kern", "position")
-DP_TAGS = ("jc", "ind", "spacing", "keepNext", "keepLines", "pageBreakBefore", "pBdr", "shd", "tabs", "contextualSpacing")
+DP_TAGS = ("jc", "ind", "spacing", "keepNext", "keepLines", "pageBreakBefore", "pBdr", "shd", "tabs", "contextualSpacing", "textDirection")
 CELL_TAGS = ("tcBorders", "shd", "noWrap", "tcMar", "textDirection", "tcFitText", "vAlign", "hideMark")
 TOKEN = re.compile(r"<(/?)w:(tbl|sdt|p)(?=[\s>/])[^>]*?(/?)>")
 KEEP = re.compile(r"<w:t(?: [^>]*)?>[^<]*\S|<w:drawing|<w:pict|<w:br\b|<w:sectPr|<w:fldChar|<w:fldSimple|<w:object|<w:instrText")
@@ -143,19 +143,36 @@ def direct_paragraph_styles(doc, names, default_p, styles):
     return doc, defs
 
 
-SHAPE_RE = r"<mc:AlternateContent\b[^>]*>(?:(?!<w:txbxContent).)*?</mc:AlternateContent>"
+SHAPE_RE = r"<mc:AlternateContent\b[^>]*>(?:(?!<mc:AlternateContent\b).)*?</mc:AlternateContent>"
+TXBX_RE = r"(<w:txbxContent\b[^>]*>)(.*?)(</w:txbxContent>)"
+
+
+def lift_shapes(doc):
+    """Swap each floating shape (mc:AlternateContent) for a SHPMKnSHPMK marker. A text box's paragraphs (from mc:Choice) move to just
+    after the paragraph that anchors the shape, between TXBXBEGINnEND and TXBXENDnEND marker paragraphs, so they are edited in doc.md;
+    every txbxContent copy in the saved shape (Choice and Fallback) becomes <!--TXBX--> and postprocess.py fills it back.
+    ponytail: a shape nested in another shape's text box stays unhandled (coverage.py flags it); none seen so far."""
+    shapes, lifted = [], {}
+
+    def mark(m):
+        x, n = m.group(), len(shapes) + 1
+        boxes = re.findall(TXBX_RE, x, re.S)
+        if boxes:
+            lifted[n] = boxes[0][1]
+            x = re.sub(TXBX_RE, r"\1<!--TXBX-->\3", x, flags=re.S)
+        shapes.append(x)
+        return f"<w:t>SHPMK{n}SHPMK</w:t>"
+
+    doc = re.sub(SHAPE_RE, mark, doc, flags=re.S)
+    for n in sorted(lifted, reverse=True):
+        at = doc.find("</w:p>", doc.find(f"SHPMK{n}SHPMK")) + len("</w:p>")
+        doc = doc[:at] + f"<w:p><w:r><w:t>TXBXBEGIN{n}END</w:t></w:r></w:p>{lifted[n]}<w:p><w:r><w:t>TXBXEND{n}END</w:t></w:r></w:p>" + doc[at:]
+    return doc, shapes
 
 
 def keep_shapes(doc, out):
-    """Floating shapes without text (lines, boxes) leave as raw XML in shapes/N.xml; postprocess.py puts them back.
-    A shape holding a text box stays unhandled, because its text would be hidden from editing."""
-    shapes = []
-
-    def mark(m):
-        shapes.append(m.group())
-        return f"<w:t>SHPMK{len(shapes)}SHPMK</w:t>"
-
-    doc = re.sub(SHAPE_RE, mark, doc, flags=re.S)
+    """Floating shapes leave as raw XML in shapes/N.xml and postprocess.py puts them back; text-box text stays editable in doc.md."""
+    doc, shapes = lift_shapes(doc)
     if shapes:
         (out / "shapes").mkdir(exist_ok=True)
         for n, x in enumerate(shapes, 1):
@@ -169,8 +186,11 @@ def reading_copy(src, out):
     styles = z.read("word/styles.xml").decode("utf-8")
     names, default_p, default_c = style_maps(styles)
     toc = toc_block(doc)
+    # the original with text boxes lifted the same way, so postprocess.py can match their paragraphs by text
+    (out / "original-flat.xml").write_text(lift_shapes(doc)[0], encoding="utf-8")
     doc = re.sub(r'<w:br\b[^>]*w:type="page"[^>]*/>', '<w:t xml:space="preserve"> PAGEBREAKMARK </w:t>', doc)
-    doc = re.sub(r"<w:tab\s*/>", '<w:t xml:space="preserve"> TABMARK </w:t>', doc)
+    # no spaces around the marker: they would come back as real spaces beside the tab
+    doc = re.sub(r"<w:tab\s*/>", "<w:t>TABMK1TABMK</w:t>", doc)
     doc = keep_shapes(doc, out)
     # Markdown folds a run of spaces into one, and Pandoc moves a space-only run out of its span; carry the count as SPMKnSPMK and reverse.lua writes it back as a raw run
     doc = re.sub(r"(<w:t(?: [^>]*)?>)([^<]*)(</w:t>)", lambda m: m.group(1) + re.sub(r" {2,}|^ +$", lambda s: f"SPMK{len(s.group())}SPMK", m.group(2)) + m.group(3), doc)
