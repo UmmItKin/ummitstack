@@ -140,10 +140,12 @@ def summarise(path):
             continue
         sections.append((sz.get(W + "w"), sz.get(W + "h"), sz.get(W + "orient") or "portrait",
                          mar.get(W + "top"), mar.get(W + "right"), mar.get(W + "bottom"), mar.get(W + "left")))
-    tables = []
+    tables, table_cells = [], []
     for t in doc.iter(W + "tbl"):
         tables.append([int(g.get(W + "w") or 0) for g in t.findall(f"{W}tblGrid/{W}gridCol")])
         table_rows.append(len(t.findall(W + "tr")))
+        table_cells.append(sum(1 for b in t.iter(W + "tcBorders") for e in b if e.get(W + "val") not in ("nil", "none"))
+                           + sum(1 for pr in t.iter(W + "tcPr") for sh in pr.findall(W + "shd") if (sh.get(W + "fill") or "auto") != "auto"))
     fields = Counter()
     for it in doc.iter(W + "instrText"):
         tok = (it.text or "").split()
@@ -165,7 +167,7 @@ def summarise(path):
     return {
         "para": para, "char": char, "custom": used,
         "headings": Counter({k: v for k, v in para.items() if re.match(r"(?i)heading \d", k) or k in ("Title", "Subtitle")}),
-        "empty": empty, "numbered": numbered, "num_ids": len(num_ids), "sections": sections, "tables": tables, "table_rows": table_rows,
+        "empty": empty, "numbered": numbered, "num_ids": len(num_ids), "sections": sections, "tables": tables, "table_rows": table_rows, "table_cells": table_cells,
         "math": sum(1 for _ in doc.iter(M + "oMath")),
         "footnotes": sum(1 for _ in doc.iter(W + "footnoteReference")) + sum(1 for _ in doc.iter(W + "endnoteReference")),
         "comments": sum(1 for _ in doc.iter(W + "commentReference")),
@@ -191,7 +193,7 @@ def show(s):
     for i, sec in enumerate(s["sections"], 1):
         print(f"section {i}: {sec[0]}x{sec[1]} {sec[2]}, margins top {sec[3]} right {sec[4]} bottom {sec[5]} left {sec[6]} (twips)")
     for i, t in enumerate(s["tables"], 1):
-        print(f"table {i}: {len(t)} columns, {s['table_rows'][i - 1]} rows, widths {t}")
+        print(f"table {i}: {len(t)} columns, {s['table_rows'][i - 1]} rows, widths {t}, cell borders and fills {s['table_cells'][i - 1]}")
     fonts = []
     for name in sorted(s["fonts"]):
         ok = font_available(name)
@@ -241,6 +243,8 @@ def compare(a, b, tol):
     same("tables", len(a["tables"]), len(b["tables"]))
     if len(a["tables"]) == len(b["tables"]) and a["table_rows"] != b["table_rows"]:
         diffs.append(f"table rows: original {a['table_rows']}, rebuilt {b['table_rows']}")
+    if len(a["tables"]) == len(b["tables"]) and a["table_cells"] != b["table_cells"]:
+        diffs.append(f"table cell borders and fills: original {a['table_cells']}, rebuilt {b['table_cells']}")
     for i, (ta, tb) in enumerate(zip(a["tables"], b["tables"]), 1):
         if len(ta) != len(tb):
             diffs.append(f"table {i} columns: original {len(ta)}, rebuilt {len(tb)}")

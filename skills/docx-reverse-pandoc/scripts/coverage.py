@@ -4,6 +4,7 @@ Exit 1 when an unhandled unit is present and not accepted.
 """
 import json, re, sys, zipfile
 from collections import Counter
+from extract_parts import SHAPE_RE
 
 STATE = {
     "rPr": ({"rFonts", "color", "sz", "szCs", "highlight", "shd", "caps", "smallCaps", "spacing", "kern", "position", "rStyle"},
@@ -58,8 +59,12 @@ def ledger(path):
         carried, native, ignorable = STATE[ctx]
         state = "carried" if tag in carried else "native" if tag in native else "ignorable" if tag in ignorable or tag.startswith("rsid") else "unhandled"
         out.append({"unit": f"{ctx}/{tag}", "count": n, "state": state})
+    kept = len(re.findall(SHAPE_RE, doc, re.S))
+    if kept:
+        out.append({"unit": "floating shapes without text (raw XML)", "count": kept, "state": "carried"})
+    rest = re.sub(SHAPE_RE, "", doc, flags=re.S)
     for name, pattern, state in STRUCTURE:
-        n = len(re.findall(pattern, doc, re.S))
+        n = len(re.findall(pattern, rest, re.S))
         if n:
             out.append({"unit": name, "count": n, "state": state})
     fields = Counter(f.split()[0].upper() for f in re.findall(r'<w:instrText[^>]*>([^<]*)</w:instrText>|<w:fldSimple[^>]*w:instr="([^"]*)"', doc) for f in f if f.strip())

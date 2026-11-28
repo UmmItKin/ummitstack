@@ -96,7 +96,15 @@ def apply_props(tbl, props):
         if info["trPr"]:
             r = re.sub(r"^(<w:tr(?: [^>]*)?>)", lambda x: x.group(1) + f"<w:trPr>{info['trPr']}</w:trPr>", r, count=1)
         cells = iter(info["cells"])
-        return re.sub(r"<w:tc>.*?</w:tc>", lambda c: re.sub(r"</w:tcPr>", lambda _, e=next(cells): e + "</w:tcPr>", c.group(), count=1), r, flags=re.S)
+
+        def cell(c):
+            # Pandoc writes an empty <w:tcPr />; open it, or the borders and fills have nowhere to go
+            body = re.sub(r"^<w:tc>\s*<w:tcPr\s*/>", "<w:tc><w:tcPr></w:tcPr>", c.group(), count=1)
+            if not re.match(r"<w:tc>\s*<w:tcPr>", body):
+                body = body.replace("<w:tc>", "<w:tc><w:tcPr></w:tcPr>", 1)
+            return re.sub(r"</w:tcPr>", lambda _, e=next(cells): e + "</w:tcPr>", body, count=1)
+
+        return re.sub(r"<w:tc>.*?</w:tc>", cell, r, flags=re.S)
 
     return re.sub(r"<w:tr\b.*?</w:tr>", row, tbl, flags=re.S)
 
@@ -155,6 +163,29 @@ def transfer_paragraph_formats(original_xml, rebuilt_xml):
     return rebuilt_xml
 
 
+def restore_shapes(s, original, folder):
+    """Put back the raw floating shapes kept by extract_parts.py, with the namespaces they need."""
+    marks = re.findall(r"<w:r><!--SHAPE (\d+)--></w:r>", s)
+    if not marks:
+        return s
+
+    def shape(m):
+        x = open(os.path.join(folder, "shapes", m.group(1) + ".xml"), encoding="utf-8").read()
+        x = re.sub(r'(<wp:docPr\b[^>]*?\bid=")\d+', lambda d: d.group(1) + str(90000 + int(m.group(1)) * 10), x)
+        x = re.sub(r'(<v:shape\b[^>]*?\bo:spid=")[^"]*', lambda d: d.group(1) + "_x0000_s" + str(9000 + int(m.group(1))), x)
+        return "<w:r>" + x + "</w:r>"
+
+    s = re.sub(r"<w:r><!--SHAPE (\d+)--></w:r>", shape, s)
+    root = re.search(r"<w:document\b[^>]*>", s).group()
+    have = dict(re.findall(r'xmlns:(\w+)="([^"]*)"', root))
+    orig = re.search(r"<w:document\b[^>]*>", original).group()
+    add = "".join(f' xmlns:{k}="{v}"' for k, v in re.findall(r'xmlns:(\w+)="([^"]*)"', orig) if k not in have)
+    ign = re.search(r'mc:Ignorable="[^"]*"', orig)
+    if ign and "mc:Ignorable" not in root:
+        add += " " + ign.group()
+    return s.replace(root, root[:-1] + add + ">", 1)
+
+
 def main():
     if len(sys.argv) not in (3, 4):
         sys.exit(__doc__)
@@ -188,7 +219,9 @@ def main():
                     s = re.sub(r"<w:tbl>.*?</w:tbl>", lambda m: fit_table(m.group(), next(it)), s, flags=re.S)
                 elif widths:
                     print(f"postprocess.py: {len(tables)} tables but {len(widths)} widths listed; table widths not applied", file=sys.stderr)
-                s = transfer_paragraph_formats(zipfile.ZipFile(ref).read("word/document.xml").decode("utf-8"), s)
+                original = zipfile.ZipFile(ref).read("word/document.xml").decode("utf-8")
+                s = transfer_paragraph_formats(original, s)
+                s = restore_shapes(s, original, os.path.dirname(os.path.abspath(out)))
                 data = s.encode("utf-8")
             zout.writestr(item, data)
     os.replace(tmp, out)

@@ -57,6 +57,8 @@ def main():
                     "detail": f"pages {s['pages_original']} and {s['pages_rebuilt']}, identical {s['identical']}, mean {s['mean']}, median {s['median']}, worst {s['worst']} (pages {s['worst_pages']})"}
             if missing:
                 look["detail"] += "; rendered with substitute fonts"
+        else:
+            look = {"result": "fail", "detail": "render failed: " + (text.strip().splitlines() or ["no output"])[-1]}
     gates["look"] = look
 
     with open(os.path.join(out, "gates.json"), "w", encoding="utf-8") as f:

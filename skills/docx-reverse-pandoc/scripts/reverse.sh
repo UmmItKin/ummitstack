@@ -3,8 +3,11 @@
 # Exit 3: a text font is not installed and --allow-missing-fonts was not given.
 set -eu
 allow=no
-for a in "$@"; do [ "$a" = "--allow-missing-fonts" ] && allow=yes; done
-set -- $(for a in "$@"; do [ "$a" = "--allow-missing-fonts" ] || printf '%s\n' "$a"; done)
+n=$#
+while [ "$n" -gt 0 ]; do
+  a=$1; shift; n=$((n - 1))
+  if [ "$a" = "--allow-missing-fonts" ]; then allow=yes; else set -- "$@" "$a"; fi
+done
 in=${1:?usage: reverse.sh input.docx [out-dir] [--allow-missing-fonts]}
 command -v pandoc >/dev/null 2>&1 || { echo "pandoc not found" >&2; exit 1; }
 [ -f "$in" ] || { echo "no such file: $in" >&2; exit 1; }

@@ -143,6 +143,26 @@ def direct_paragraph_styles(doc, names, default_p, styles):
     return doc, defs
 
 
+SHAPE_RE = r"<mc:AlternateContent\b[^>]*>(?:(?!<w:txbxContent).)*?</mc:AlternateContent>"
+
+
+def keep_shapes(doc, out):
+    """Floating shapes without text (lines, boxes) leave as raw XML in shapes/N.xml; postprocess.py puts them back.
+    A shape holding a text box stays unhandled, because its text would be hidden from editing."""
+    shapes = []
+
+    def mark(m):
+        shapes.append(m.group())
+        return f"<w:t>SHPMK{len(shapes)}SHPMK</w:t>"
+
+    doc = re.sub(SHAPE_RE, mark, doc, flags=re.S)
+    if shapes:
+        (out / "shapes").mkdir(exist_ok=True)
+        for n, x in enumerate(shapes, 1):
+            (out / "shapes" / f"{n}.xml").write_text(x, encoding="utf-8")
+    return doc
+
+
 def reading_copy(src, out):
     z = zipfile.ZipFile(src)
     doc = z.read("word/document.xml").decode("utf-8")
@@ -151,6 +171,9 @@ def reading_copy(src, out):
     toc = toc_block(doc)
     doc = re.sub(r'<w:br\b[^>]*w:type="page"[^>]*/>', '<w:t xml:space="preserve"> PAGEBREAKMARK </w:t>', doc)
     doc = re.sub(r"<w:tab\s*/>", '<w:t xml:space="preserve"> TABMARK </w:t>', doc)
+    doc = keep_shapes(doc, out)
+    # Markdown folds a run of spaces into one, and Pandoc moves a space-only run out of its span; carry the count as SPMKnSPMK and reverse.lua writes it back as a raw run
+    doc = re.sub(r"(<w:t(?: [^>]*)?>)([^<]*)(</w:t>)", lambda m: m.group(1) + re.sub(r" {2,}|^ +$", lambda s: f"SPMK{len(s.group())}SPMK", m.group(2)) + m.group(3), doc)
     doc = re.sub(r'<w:fldSimple\b[^>]*w:instr="[^"]*SEQ[^"]*"[^>]*>(.*?)</w:fldSimple>', r"\1", doc, flags=re.S)
     doc, run_defs = direct_run_styles(doc, default_c)
     doc, empties = empty_paragraphs(doc)

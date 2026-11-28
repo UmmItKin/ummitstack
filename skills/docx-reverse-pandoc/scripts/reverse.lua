@@ -27,13 +27,66 @@ function Header(el)
   end
 end
 
+-- A raw space run sits outside Pandoc's own formatting, so its span style, bold and italic are written in here.
+local SPACE_RUN = '^<w:r>(.-)<w:t xml:space="preserve">( +)</w:t></w:r>$'
+
+local function with_props(el, front, back)
+  return el:walk({
+    Str = function(s)
+      local n = s.text:match("^SPMK(%d+)SPMK$")
+      if n then
+        return pandoc.RawInline("openxml", '<w:r><w:rPr>' .. front .. back .. '</w:rPr><w:t xml:space="preserve">' .. string.rep(" ", tonumber(n)) .. "</w:t></w:r>")
+      end
+    end,
+    RawInline = function(r)
+      local pr, sp = r.text:match(SPACE_RUN)
+      if r.format == "openxml" and sp then
+        pr = pr:match("^<w:rPr>(.*)</w:rPr>$") or ""
+        return pandoc.RawInline("openxml", '<w:r><w:rPr>' .. front .. pr .. back .. '</w:rPr><w:t xml:space="preserve">' .. sp .. "</w:t></w:r>")
+      end
+    end,
+  })
+end
+
+function Strong(el)
+  return with_props(el, "", "<w:b/><w:bCs/>")
+end
+
+function Emph(el)
+  return with_props(el, "", "<w:i/><w:iCs/>")
+end
+
 function Span(el)
-  if el.attributes["custom-style"] == "Footnote Reference" and #el.content == 0 then
+  local style = el.attributes["custom-style"]
+  if style == "Footnote Reference" and #el.content == 0 then
     return {}
+  end
+  if style then
+    return with_props(el, '<w:rStyle w:val="' .. style .. '"/>', "")
   end
 end
 
+-- markers with no spaces around them, so Pandoc keeps them inside the text and its span
+local function marker(kind, n)
+  if kind == "SHPMK" then
+    return pandoc.RawInline("openxml", "<w:r><!--SHAPE " .. n .. "--></w:r>")
+  end
+  return pandoc.RawInline("openxml", '<w:r><w:t xml:space="preserve">' .. string.rep(" ", tonumber(n)) .. "</w:t></w:r>")
+end
+
 function Str(el)
+  if el.text:find("S[H]?PMK%d+S[H]?PMK") then
+    local out, rest = {}, el.text
+    while true do
+      local a, b, kind, n = rest:find("(S[H]?PMK)(%d+)%1")
+      if not a then break end
+      if a > 1 then out[#out + 1] = pandoc.Str(rest:sub(1, a - 1)) end
+      out[#out + 1] = marker(kind, n)
+      rest = rest:sub(b + 1)
+    end
+    if #rest > 0 then out[#out + 1] = pandoc.Str(rest) end
+    return out
+  end
   if el.text == "PAGEBREAKMARK" then
     return pandoc.RawInline("openxml", '<w:r><w:br w:type="page"/></w:r>')
   end

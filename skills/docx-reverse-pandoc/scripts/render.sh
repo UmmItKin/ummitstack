@@ -12,10 +12,11 @@ done
 [ ! -e "$out" ] || { echo "$out already exists; choose a new directory" >&2; exit 1; }
 mkdir -p "$out/o" "$out/r" "$out/profile"
 out=$(cd "$out" && pwd)
+url=file://$(printf %s "$out/profile" | sed 's/%/%25/g; s/ /%20/g')
 cp "$a" "$out/o/original.docx"
 cp "$b" "$out/r/rebuilt.docx"
 for d in o r; do
-  soffice "-env:UserInstallation=file://$out/profile" --headless --convert-to pdf --outdir "$out/$d" "$out/$d/$(ls "$out/$d" | head -1)" >/dev/null 2>&1
+  soffice "-env:UserInstallation=$url" --headless --convert-to pdf --outdir "$out/$d" "$out/$d/$(ls "$out/$d" | head -1)" >/dev/null 2>&1
 done
 echo "pages  original: $(pdfinfo "$out/o/original.pdf" | awk '/^Pages/{print $2}')   rebuilt: $(pdfinfo "$out/r/rebuilt.pdf" | awk '/^Pages/{print $2}')"
 pdftoppm -r 38 -png -f "$first" -l "$last" "$out/o/original.pdf" "$out/o/p"
